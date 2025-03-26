@@ -1,3 +1,18 @@
+type Event = 
+ record {
+   collectedAmount: nat;
+   description: text;
+   targetAmount: nat;
+   title: text;
+ };
+type DonationEntry = 
+ record {
+   amount: nat;
+   donor: principal;
+ };
 service : {
-  whoami: () -> (principal) query;
+  createEvent: (text, text, nat) -> (bool);
+  donate: (text, nat) -> (bool);
+  getEventDonations: (text) -> (vec DonationEntry) query;
+  getEvents: () -> (vec Event) query;
 }

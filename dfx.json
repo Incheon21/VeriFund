@@ -28,7 +28,7 @@
   "output_env_file": ".env",
   "defaults": {
     "build": {
-      "packtool": "mops sources"
+      "packtool": "npx ic-mops sources"
     }
   }
 }
