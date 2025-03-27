@@ -27,11 +27,9 @@ export default function Profile() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Create a new campaign using createCampaign(text, text, text, nat) → (bool)
   const createCampaign = async (e) => {
     e.preventDefault();
     try {
-      // Convert target to BigInt, as expected by Motoko for Nat
       const success = await backendActor.createCampaign(
         formData.id,
         formData.title,
@@ -82,91 +80,70 @@ export default function Profile() {
     <div className="min-h-screen w-[100vw] bg-white text-gray-800">
       <main className="container mx-auto px-4 flex flex-row gap-12">
         <section className="flex w-full flex-col h-full">
-        {/* PROFILE SECTION */}
-        <section className="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-md shadow p-6 mb-8">
-          <div className="flex items-center space-x-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Sophia Carter</h1>
+          <section className="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-md shadow p-6 mb-8">
+            <div className="flex items-center space-x-4">
               <p>{principal}</p>
-              <p className="text-sm text-gray-500">Kindness Ambassador</p>
-              <p className="text-sm text-gray-500">Joined 2019</p>
             </div>
-          </div>
-          <div className="w-[20%] mt-4 md:mt-0 flex space-x-2 flex-col gap-2">
-            <button className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Edit profile</button>
-            <button className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">View public profiles</button>
-          </div>
+          </section>
+
+          <section className="bg-white rounded-md shadow p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
+            <form onSubmit={createCampaign} className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-1">Campaign ID:</label>
+                <input
+                  type="text"
+                  name="id"
+                  value={formData.id}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="Enter unique campaign id"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Title:</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="Campaign title"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Description:</label>
+                <input
+                  type="text"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="Campaign description"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1">Target (in ICP):</label>
+                <input
+                  type="number"
+                  name="target"
+                  value={formData.target}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                  placeholder="e.g., 1000"
+                  required
+                />
+              </div>
+              <button type="submit" className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition">
+                Create
+              </button>
+            </form>
+          </section>
         </section>
 
-        {/* TAB MENU */}
-        <section className="bg-white rounded-md shadow p-4 mb-8">
-          <nav className="flex space-x-8 border-b border-gray-200">
-            <button className="pb-2 text-gray-800 border-b-2 border-blue-600">Events</button>
-            <button className="pb-2 text-gray-500 hover:text-gray-800">Campaigns</button>
-            <button className="pb-2 text-gray-500 hover:text-gray-800">Donation</button>
-          </nav>
-        </section>
-
-        {/* Campaign Creation Form */}
-        <section className="bg-white rounded-md shadow p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
-          <form onSubmit={createCampaign} className="space-y-4">
-            <div>
-              <label className="block font-semibold mb-1">Campaign ID:</label>
-              <input
-                type="text"
-                name="id"
-                value={formData.id}
-                onChange={handleInputChange}
-                className="w-full border rounded px-3 py-2"
-                placeholder="Enter unique campaign id"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Title:</label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                className="w-full border rounded px-3 py-2"
-                placeholder="Campaign title"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Description:</label>
-              <input
-                type="text"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="w-full border rounded px-3 py-2"
-                placeholder="Campaign description"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-semibold mb-1">Target (in ICP):</label>
-              <input
-                type="number"
-                name="target"
-                value={formData.target}
-                onChange={handleInputChange}
-                className="w-full border rounded px-3 py-2"
-                placeholder="e.g., 1000"
-                required
-              />
-            </div>
-            <button type="submit" className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition">
-              Create
-            </button>
-          </form>
-        </section>
-        </section>
-
-        {/* Load and Display Campaigns */}
         <section className="bg-white rounded-md shadow p-6 flex w-full flex-col">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Campaigns</h2>
@@ -182,7 +159,9 @@ export default function Profile() {
                 <li key={index} className="mb-2 shadow-md border border-gray-200 rounded-xl p-6">
                   <p className="font-bold text-3xl">{camp.title}</p>
                   <p>{camp.description}</p>
-                  <p>Collected: {camp.collected.toString()} / Target: {camp.target.toString()}</p>
+                  <p>
+                    Collected: {camp.collected.toString()} / Target: {camp.target.toString()}
+                  </p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>
                   <button
                     onClick={() => donateToCampaign(camp.id, 10)}
