@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { AuthClient } from '@dfinity/auth-client';
-import { createActor } from 'declarations/backend';
-import { canisterId } from 'declarations/backend/index.js';
+import React, { useState, useEffect } from "react";
+import { AuthClient } from "@dfinity/auth-client";
+import { createActor } from "declarations/backend";
+import { canisterId } from "declarations/backend/index.js";
 
 const network = process.env.DFX_NETWORK;
 const identityProvider =
-  network === 'ic'
-    ? 'https://identity.ic0.app' // Mainnet
-    : 'http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943'; // Local
+  network === "ic"
+    ? "https://identity.ic0.app" // Mainnet
+    : "http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943"; // Local
 
 // Reusable button component
 const Button = ({ onClick, children }) => <button onClick={onClick}>{children}</button>;
@@ -17,7 +17,7 @@ const Home = () => {
     actor: undefined,
     authClient: undefined,
     isAuthenticated: false,
-    principal: 'Click "Whoami" to see your principal ID'
+    principal: 'Click "Whoami" to see your principal ID',
   });
 
   // Initialize auth client
@@ -30,8 +30,8 @@ const Home = () => {
     const identity = authClient.getIdentity();
     const actor = createActor(canisterId, {
       agentOptions: {
-        identity
-      }
+        identity,
+      },
     });
     const isAuthenticated = await authClient.isAuthenticated();
 
@@ -39,14 +39,14 @@ const Home = () => {
       ...prev,
       actor,
       authClient,
-      isAuthenticated
+      isAuthenticated,
     }));
   };
 
   const login = async () => {
     await state.authClient.login({
       identityProvider,
-      onSuccess: updateActor
+      onSuccess: updateActor,
     });
   };
 
@@ -58,14 +58,14 @@ const Home = () => {
   const whoami = async () => {
     setState((prev) => ({
       ...prev,
-      principal: 'Loading...'
+      principal: "Loading...",
     }));
 
     const result = await state.actor.whoami();
     const principal = result.toString();
     setState((prev) => ({
       ...prev,
-      principal
+      principal,
     }));
   };
 
@@ -75,20 +75,20 @@ const Home = () => {
       <div id="info-box" className="info-box">
         <div className="info-content">
           <p>
-            <i className="fas fa-info-circle"></i> A <strong>principal</strong> is a unique identifier in the Internet
-            Computer ecosystem.
+            <i className="fas fa-info-circle"></i> A <strong>principal</strong> is a unique identifier in the Internet Computer
+            ecosystem.
           </p>
           <p>
-            It represents an entity (user, canister smart contract, or other) and is used for identification and
-            authorization purposes.
+            It represents an entity (user, canister smart contract, or other) and is used for identification and authorization
+            purposes.
           </p>
           <p>
-            In this example, click "Whoami" to find out the principal ID with which you're interacting with the backend.
-            If you're not signed in, you will see that you're using the so-called anonymous principal, "2vxsx-fae".
+            In this example, click "Whoami" to find out the principal ID with which you're interacting with the backend. If you're
+            not signed in, you will see that you're using the so-called anonymous principal, "2vxsx-fae".
           </p>
           <p>
-            After you've logged in with Internet Identity, you'll see a longer principal, which is unique to your
-            identity and the dapp you're using.
+            After you've logged in with Internet Identity, you'll see a longer principal, which is unique to your identity and the
+            dapp you're using.
           </p>
         </div>
       </div>
