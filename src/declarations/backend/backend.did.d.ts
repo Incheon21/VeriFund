@@ -40,6 +40,7 @@ export interface VeriFund {
   'releaseDecision' : ActorMethod<[string, boolean], boolean>,
   'stakeAsAuditor' : ActorMethod<[bigint], boolean>,
   'submitProof' : ActorMethod<[string, string, string], boolean>,
+  'whoami' : ActorMethod<[], Principal>,
 }
 export interface _SERVICE extends VeriFund {}
 export declare const idlFactory: IDL.InterfaceFactory;

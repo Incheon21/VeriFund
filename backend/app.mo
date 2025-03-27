@@ -249,4 +249,9 @@ actor class VeriFund() = this {
   public query func getMyStake(who: Principal): async Nat {
     Option.get(stakes.get(who), 0);
   };
+
+  public query (message) func whoami() : async Principal {
+    message.caller;
+  };
 };
+

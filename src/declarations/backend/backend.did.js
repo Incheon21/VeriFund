@@ -47,6 +47,7 @@ export const idlFactory = ({ IDL }) => {
     'releaseDecision' : IDL.Func([IDL.Text, IDL.Bool], [IDL.Bool], []),
     'stakeAsAuditor' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'submitProof' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
+    'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
   return VeriFund;
 };
