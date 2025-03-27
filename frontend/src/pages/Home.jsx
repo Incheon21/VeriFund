@@ -1,112 +1,56 @@
-import React, { useState, useEffect } from 'react';
-import { AuthClient } from '@dfinity/auth-client';
-import { createActor } from 'declarations/backend';
-import { canisterId } from 'declarations/backend/index.js';
-
-const network = process.env.DFX_NETWORK;
-const identityProvider =
-  network === 'ic'
-    ? 'https://identity.ic0.app' // Mainnet
-    : 'http://rdmx6-jaaaa-aaaaa-aaadq-cai.localhost:4943'; // Local
+import React from 'react';
+import { useAuth } from '../utils/auth.jsx';
 
 // Reusable button component
-const Button = ({ onClick, children }) => <button onClick={onClick}>{children}</button>;
+const Button = ({ onClick, children, className }) => (
+  <button 
+    onClick={onClick} 
+    className={`bg-[#12A3ED] hover:bg-[#1292ed] text-white font-bold py-2 px-4 rounded-lg ${className}`}
+  >
+    {children}
+  </button>
+);
 
 const Home = () => {
-  const [state, setState] = useState({
-    actor: undefined,
-    authClient: undefined,
-    isAuthenticated: false,
-    principal: 'Click "Whoami" to see your principal ID'
-  });
-
-  // Initialize auth client
-  useEffect(() => {
-    updateActor();
-  }, []);
-
-  const updateActor = async () => {
-    const authClient = await AuthClient.create();
-    const identity = authClient.getIdentity();
-    const actor = createActor(canisterId, {
-      agentOptions: {
-        identity
-      }
-    });
-    const isAuthenticated = await authClient.isAuthenticated();
-
-    setState((prev) => ({
-      ...prev,
-      actor,
-      authClient,
-      isAuthenticated
-    }));
-  };
-
-  const login = async () => {
-    await state.authClient.login({
-      identityProvider,
-      onSuccess: updateActor
-    });
-  };
-
-  const logout = async () => {
-    await state.authClient.logout();
-    updateActor();
-  };
-
-  const whoami = async () => {
-    setState((prev) => ({
-      ...prev,
-      principal: 'Loading...'
-    }));
-
-    const result = await state.actor.whoami();
-    const principal = result.toString();
-    setState((prev) => ({
-      ...prev,
-      principal
-    }));
-  };
+  const { isAuthenticated, principal, whoami } = useAuth();
 
   return (
-    <div>
-      <h1>Who Are You?</h1>
-      <div id="info-box" className="info-box">
-        <div className="info-content">
-          <p>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Who Are You?</h1>
+      <div className="bg-gray-100 p-4 mb-4 rounded-md">
+        <div>
+          <p className="mb-2">
             <i className="fas fa-info-circle"></i> A <strong>principal</strong> is a unique identifier in the Internet
             Computer ecosystem.
           </p>
-          <p>
+          <p className="mb-2">
             It represents an entity (user, canister smart contract, or other) and is used for identification and
             authorization purposes.
           </p>
-          <p>
+          <p className="mb-2">
             In this example, click "Whoami" to find out the principal ID with which you're interacting with the backend.
             If you're not signed in, you will see that you're using the so-called anonymous principal, "2vxsx-fae".
           </p>
-          <p>
+          <p className="mb-2">
             After you've logged in with Internet Identity, you'll see a longer principal, which is unique to your
             identity and the dapp you're using.
           </p>
         </div>
       </div>
 
-      {!state.isAuthenticated ? (
-        <Button onClick={login}>Login with Internet Identity</Button>
-      ) : (
-        <Button onClick={logout}>Logout</Button>
-      )}
+      <Button onClick={whoami} className="mb-4">Whoami</Button>
 
-      <Button onClick={whoami}>Whoami</Button>
-
-      {state.principal && (
-        <div>
-          <h2>Your principal ID is:</h2>
-          <h4>{state.principal}</h4>
+      {principal && (
+        <div className="mt-4">
+          <h2 className="text-xl font-bold">Your principal ID is:</h2>
+          <h4 className="text-lg bg-gray-100 p-2 mt-2 rounded break-all">{principal}</h4>
         </div>
       )}
+
+      <div className="mt-4">
+        <h3 className="font-bold">Authentication Status:</h3>
+        <p>{isAuthenticated ? 'Logged In' : 'Not Logged In'}</p>
+      </div>
     </div>
   );
 };

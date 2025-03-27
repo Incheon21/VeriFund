@@ -12,36 +12,6 @@ body {
   align-items: center;
 }
 
-#app {
-  width: 100%;
-  max-width: 800px;
-  background-color: #fcf7f6;
-  padding: 2rem;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-}
-
-h1 {
-  text-align: center;
-  color: #7421f0;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-}
-
-h2 {
-  text-align: center;
-  color: #7421f0;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-}
-
-h4 {
-  text-align: center;
-  color: #7421f0;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
 .info-box {
   background-color: #f3ded9;
   border: 2px solid #e1796b;
@@ -83,39 +53,6 @@ h4 {
   color: #e1796b;
 }
 
-button {
-  padding: 0.7rem 1.2rem;
-  font-size: 1rem;
-  cursor: pointer;
-  background-color: #e1796b;
-  color: #f3ded9;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s, transform 0.1s;
-  margin: 0.5rem;
-  font-weight: bold;
-  align-content: center;
-}
-
-button:hover {
-  background-color: #37d299;
-  transform: translateY(-2px);
-}
-
-button:active {
-  transform: translateY(0);
-}
-
-#content p {
-  margin-top: 1rem;
-  font-size: 1.1rem;
-  word-break: break-all;
-  background-color: #f3ded9;
-  padding: 10px;
-  border-radius: 4px;
-  border-left: 3px solid #e1796b;
-  align-content: center;
-}
 
 @media (max-width: 768px) {
   #app {
