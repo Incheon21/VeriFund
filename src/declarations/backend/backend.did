@@ -1,3 +1,12 @@
+type Time = int;
+type Report = 
+ record {
+   amountUsed: nat;
+   description: text;
+   proofLink: text;
+   timestamp: Time;
+   verified: bool;
+ };
 type Event = 
  record {
    collectedAmount: nat;
@@ -13,6 +22,9 @@ type DonationEntry =
 service : {
   createEvent: (text, text, nat) -> (bool);
   donate: (text, nat) -> (bool);
+  getCertifiedData: () -> (blob) query;
   getEventDonations: (text) -> (vec DonationEntry) query;
+  getEventReports: (text) -> (vec Report) query;
   getEvents: () -> (vec Event) query;
+  submitReport: (text, text, nat, text) -> (bool);
 }

@@ -71,7 +71,7 @@ const App = () => {
 
   return (
     <div>
-      <h1>Who Am I?</h1>
+      <h1>Who Are You?</h1>
       <div id="info-box" className="info-box">
         <div className="info-content">
           <p>

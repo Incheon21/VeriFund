@@ -9,11 +9,22 @@ export interface Event {
   'targetAmount' : bigint,
   'collectedAmount' : bigint,
 }
+export interface Report {
+  'verified' : boolean,
+  'proofLink' : string,
+  'description' : string,
+  'amountUsed' : bigint,
+  'timestamp' : Time,
+}
+export type Time = bigint;
 export interface _SERVICE {
   'createEvent' : ActorMethod<[string, string, bigint], boolean>,
   'donate' : ActorMethod<[string, bigint], boolean>,
+  'getCertifiedData' : ActorMethod<[], Uint8Array | number[]>,
   'getEventDonations' : ActorMethod<[string], Array<DonationEntry>>,
+  'getEventReports' : ActorMethod<[string], Array<Report>>,
   'getEvents' : ActorMethod<[], Array<Event>>,
+  'submitReport' : ActorMethod<[string, string, bigint, string], boolean>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

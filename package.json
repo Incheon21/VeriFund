@@ -8,5 +8,10 @@
   "type": "module",
   "workspaces": [
     "frontend"
-  ]
+  ],
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.17",
+    "example": "file:",
+    "tailwindcss": "^4.0.17"
+  }
 }
