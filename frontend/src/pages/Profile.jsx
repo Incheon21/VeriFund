@@ -2,6 +2,7 @@ import React, { useState } from "react";
 // Import the createActor helper and canisterId from your generated declarations
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
+import { useAuth } from "../utils/auth";
 
 // Create the backend actor. Adjust the host if needed.
 const backendActor = createActor(canisterId, {
@@ -12,6 +13,7 @@ const backendActor = createActor(canisterId, {
 
 export default function Profile() {
   // State for campaigns and the campaign creation form
+  const { principal } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [formData, setFormData] = useState({
     id: "",
@@ -77,20 +79,22 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-800">
-      <main className="container mx-auto px-4 py-8">
+    <div className="min-h-screen w-[100vw] bg-white text-gray-800">
+      <main className="container mx-auto px-4 flex flex-row gap-12">
+        <section className="flex w-full flex-col h-full">
         {/* PROFILE SECTION */}
         <section className="flex flex-col md:flex-row md:items-center md:justify-between bg-white rounded-md shadow p-6 mb-8">
           <div className="flex items-center space-x-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Sophia Carter</h1>
+              <p>{principal}</p>
               <p className="text-sm text-gray-500">Kindness Ambassador</p>
               <p className="text-sm text-gray-500">Joined 2019</p>
             </div>
           </div>
-          <div className="mt-4 md:mt-0 flex space-x-2">
-            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Edit profile</button>
-            <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">View public profiles</button>
+          <div className="w-[20%] mt-4 md:mt-0 flex space-x-2 flex-col gap-2">
+            <button className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">Edit profile</button>
+            <button className="w-full px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">View public profiles</button>
           </div>
         </section>
 
@@ -156,12 +160,14 @@ export default function Profile() {
               />
             </div>
             <button type="submit" className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition">
+              Create
             </button>
           </form>
         </section>
+        </section>
 
         {/* Load and Display Campaigns */}
-        <section className="bg-white rounded-md shadow p-6">
+        <section className="bg-white rounded-md shadow p-6 flex w-full flex-col">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Campaigns</h2>
             <button onClick={loadCampaigns} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-400 transition">
@@ -173,8 +179,8 @@ export default function Profile() {
           ) : (
             <ul>
               {campaigns.map((camp, index) => (
-                <li key={index} className="mb-2 border-b pb-2">
-                  <p className="font-bold">{camp.title}</p>
+                <li key={index} className="mb-2 shadow-md border border-gray-200 rounded-xl p-6">
+                  <p className="font-bold text-3xl">{camp.title}</p>
                   <p>{camp.description}</p>
                   <p>Collected: {camp.collected.toString()} / Target: {camp.target.toString()}</p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>

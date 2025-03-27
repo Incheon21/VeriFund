@@ -13,14 +13,19 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 z-50 bg-[#E5E8EB] px-12 p-4 flex w-full justify-between items-center text-black">
       <h1 className="text-xl font-bold">VeriFund</h1>
-      <div className="relative">
+      <div className="gap-4 relative flex flex-row items-center justify-center">
+        <div className="gap-4 flex flex-row items-center justify-center">
+          <p>Home</p>
+          <p>About</p>
+          <p>Explore</p>
+        </div>
         {isAuthenticated ? (
-          <div>
+          <div clas>
             <button
-              className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-black rounded-full text-white hover:bg-[#242424] font-bold p-2"
               onClick={toggleDropdown}
             >
-              {principal}
+              <img src="/profile.png" className="w-8 h-8 rounded-full" />
             </button>
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
