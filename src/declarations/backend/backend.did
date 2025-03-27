@@ -1,18 +1,47 @@
-type Event = 
- record {
-   collectedAmount: nat;
-   description: text;
-   targetAmount: nat;
-   title: text;
+type VeriFund = 
+ service {
+   createCampaign: (text, text, text, nat) -> (bool);
+   donate: (text, nat) -> (bool);
+   getAuditor: (text) -> (opt principal) query;
+   getCampaigns: () -> (vec Campaign) query;
+   getCertifiedData: () -> (blob) query;
+   getDonations: (text) -> (vec Donation) query;
+   getMyPendingCampaigns: (principal) -> (vec text) query;
+   getMyStake: (principal) -> (nat) query;
+   getProofs: (text) -> (vec Proof) query;
+   pickAuditor: (text) -> (bool);
+   releaseDecision: (text, bool) -> (bool);
+   stakeAsAuditor: (nat) -> (bool);
+   submitProof: (text, text, text) -> (bool);
  };
-type DonationEntry = 
+type Time = int;
+type Proof = 
+ record {
+   description: text;
+   timestamp: Time;
+   url: text;
+   verified: bool;
+ };
+type Donation = 
  record {
    amount: nat;
    donor: principal;
+   timestamp: Time;
  };
-service : {
-  createEvent: (text, text, nat) -> (bool);
-  donate: (text, nat) -> (bool);
-  getEventDonations: (text) -> (vec DonationEntry) query;
-  getEvents: () -> (vec Event) query;
-}
+type CampaignStatus = 
+ variant {
+   active;
+   pending_release;
+   released;
+ };
+type Campaign = 
+ record {
+   collected: nat;
+   description: text;
+   id: text;
+   owner: principal;
+   status: CampaignStatus;
+   target: nat;
+   title: text;
+ };
+service : () -> VeriFund
