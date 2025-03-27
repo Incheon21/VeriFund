@@ -176,11 +176,8 @@ export default function Profile() {
                 <li key={index} className="mb-2 border-b pb-2">
                   <p className="font-bold">{camp.title}</p>
                   <p>{camp.description}</p>
-                  <p>
-                    Collected: {camp.collected} / Target: {camp.target}
-                  </p>
+                  <p>Collected: {camp.collected.toString()} / Target: {camp.target.toString()}</p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>
-                  {/* (Optional) Donate button for demonstration */}
                   <button
                     onClick={() => donateToCampaign(camp.id, 10)}
                     className="mt-2 inline-block rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-400">
