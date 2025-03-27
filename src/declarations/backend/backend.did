@@ -13,6 +13,7 @@ type VeriFund =
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
    submitProof: (text, text, text) -> (bool);
+   whoami: () -> (principal) query;
  };
 type Time = int;
 type Proof = 
