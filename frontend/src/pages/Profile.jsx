@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 // Import the createActor helper and canisterId from your generated declarations
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
@@ -7,22 +7,24 @@ import { useAuth } from "../utils/auth";
 // Create the backend actor. Adjust the host if needed.
 const backendActor = createActor(canisterId, {
   agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
+    host:
+      process.env.DFX_NETWORK === "ic"
+        ? "https://ic0.app"
+        : "http://localhost:4943",
   },
 });
 
 export default function Profile() {
-  // State for campaigns and the campaign creation form
   const { principal } = useAuth();
+  console.log(principal);
   const [campaigns, setCampaigns] = useState([]);
   const [formData, setFormData] = useState({
-    id: "",
     title: "",
     description: "",
     target: "",
+    date: "",
   });
 
-  // Handler to update form fields
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -31,17 +33,15 @@ export default function Profile() {
     e.preventDefault();
     try {
       const success = await backendActor.createCampaign(
-        formData.id,
         formData.title,
         formData.description,
-        BigInt(formData.target)
+        BigInt(formData.target),
+        BigInt(new Date(formData.date).getTime()) * 1_000_000n
       );
       if (success) {
         alert("Campaign created successfully!");
-        setFormData({ id: "", title: "", description: "", target: "" });
-        loadCampaigns(); // refresh list
-      } else {
-        alert("Campaign creation failed. It might already exist.");
+        setFormData({ title: "", description: "", target: "", date: "" });
+        loadCampaigns();
       }
     } catch (error) {
       console.error("Error creating campaign:", error);
@@ -49,7 +49,6 @@ export default function Profile() {
     }
   };
 
-  // Load campaigns using getCampaigns() → (vec record {...})
   const loadCampaigns = async () => {
     try {
       const campaignsData = await backendActor.getCampaigns();
@@ -60,21 +59,9 @@ export default function Profile() {
     }
   };
 
-  // (Optional) Donate to a campaign using donate(text, nat) → (bool)
-  const donateToCampaign = async (campaignId, amount) => {
-    try {
-      const result = await backendActor.donate(campaignId, BigInt(amount));
-      if (result) {
-        alert("Donation successful!");
-        loadCampaigns();
-      } else {
-        alert("Donation failed.");
-      }
-    } catch (error) {
-      console.error("Donation error:", error);
-      alert("Error during donation.");
-    }
-  };
+  useEffect(() => {
+    loadCampaigns();
+  }, []);
 
   return (
     <div className="min-h-screen w-[100vw] bg-white text-gray-800">
@@ -89,18 +76,6 @@ export default function Profile() {
           <section className="bg-white rounded-md shadow p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4">Create New Campaign</h2>
             <form onSubmit={createCampaign} className="space-y-4">
-              <div>
-                <label className="block font-semibold mb-1">Campaign ID:</label>
-                <input
-                  type="text"
-                  name="id"
-                  value={formData.id}
-                  onChange={handleInputChange}
-                  className="w-full border rounded px-3 py-2"
-                  placeholder="Enter unique campaign id"
-                  required
-                />
-              </div>
               <div>
                 <label className="block font-semibold mb-1">Title:</label>
                 <input
@@ -126,7 +101,9 @@ export default function Profile() {
                 />
               </div>
               <div>
-                <label className="block font-semibold mb-1">Target (in ICP):</label>
+                <label className="block font-semibold mb-1">
+                  Target (in ICP):
+                </label>
                 <input
                   type="number"
                   name="target"
@@ -137,7 +114,21 @@ export default function Profile() {
                   required
                 />
               </div>
-              <button type="submit" className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition">
+              <div>
+                <label className="block font-semibold mb-1">Target Date:</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date}
+                  onChange={handleInputChange}
+                  className="w-full border rounded px-3 py-2"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition"
+              >
                 Create
               </button>
             </form>
@@ -146,28 +137,35 @@ export default function Profile() {
 
         <section className="bg-white rounded-md shadow p-6 flex w-full flex-col">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Campaigns</h2>
-            <button onClick={loadCampaigns} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-400 transition">
-              Load Campaigns
-            </button>
+            <h2 className="text-4xl font-semibold">My Campaigns</h2>
           </div>
           {campaigns.length === 0 ? (
             <p>No campaigns available. Click "Load Campaigns" to fetch data.</p>
           ) : (
             <ul>
               {campaigns.map((camp, index) => (
-                <li key={index} className="mb-2 shadow-md border border-gray-200 rounded-xl p-6">
+                <li
+                  key={index}
+                  className="mb-2 shadow-md border border-gray-200 rounded-xl p-6"
+                >
                   <p className="font-bold text-3xl">{camp.title}</p>
                   <p>{camp.description}</p>
                   <p>
-                    Collected: {camp.collected.toString()} / Target: {camp.target.toString()}
+                    Collected: {camp.collected.toString()} / Target:{" "}
+                    {camp.target.toString()}
                   </p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>
-                  <button
-                    onClick={() => donateToCampaign(camp.id, 10)}
-                    className="mt-2 inline-block rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-400">
-                    Donate 10 ICP
-                  </button>
+                  <p>
+                    Date:{" "}
+                    {new Date(Number(camp.date) / 1_000_000).toLocaleDateString(
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
                 </li>
               ))}
             </ul>

@@ -29,6 +29,7 @@ actor class VeriFund() = this {
     target: Nat;
     collected: Nat;
     status: CampaignStatus;
+    date: Time.Time;
   };
 
   type Donation = {
@@ -105,15 +106,18 @@ actor class VeriFund() = this {
     certifiedState
   };
 
-  // Create a fundraising campaign (Fundraiser role)
-  public shared(msg) func createCampaign(id: Text, title: Text, description: Text, target: Nat): async Bool {
-    if (Option.isSome(campaigns.get(id))) return false;
-    campaigns.put(id, {
-      id; title; description; owner = msg.caller;
-      target; collected = 0; status = #active
-    });
-    updateCertifiedData();
-    return true;
+  stable var campaignCounter: Nat = 0; // Counter for unique IDs
+  
+  public shared(msg) func createCampaign(title: Text, description: Text, target: Nat, date:Time.Time): async Bool {
+      let id = "campaign_" # Nat.toText(campaignCounter); // Generate unique ID
+      campaignCounter += 1; // Increment the counter
+  
+      if (Option.isSome(campaigns.get(id))) return false;
+      campaigns.put(id, {
+        id; title; description; owner = msg.caller; target; collected = 0; status = #active; date;
+      });
+      updateCertifiedData();
+      return true;
   };
 
   // Donate ICP (mocked) to a specific campaign
