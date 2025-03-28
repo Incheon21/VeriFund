@@ -16,8 +16,11 @@ type VeriFund =
    deleteFile: (text) -> (bool);
    donate: (principal, text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
+   getBalance: (Account__1) -> (Result_3);
+   getCampaignAccount: (nat) -> (Account__1);
    getCampaigns: () -> (vec Campaign) query;
    getCampaignsByUser: (principal) -> (vec Campaign) query;
+   getCanisterAccount: () -> (Account__1);
    getCertifiedData: () -> (blob) query;
    getDonationsByID: (text) -> (vec Donation) query;
    getDonationsByUser: (principal) -> (vec Donation) query;
@@ -34,17 +37,45 @@ type VeriFund =
    getProofs: (text) -> (vec Proof) query;
    getTotalChunks: (text) -> (nat);
    pickAuditor: (text) -> (bool);
+   recordDonation: (nat, nat) -> (Result_2);
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
    submitProof: (text, text, text) -> (bool);
+   transfer: (TransferArgs) -> (Result_1);
    transform: (record {
                  context: blob;
                  response: http_request_result;
                }) -> (http_request_result) query;
    uploadFileChunk: (text, blob, nat, text) -> ();
+   verifyTransaction: (BlockIndex) -> (Result);
    whoami: () -> (principal) query;
  };
+type TransferArgs = 
+ record {
+   amount: nat;
+   toAccount: Account;
+ };
 type Time = int;
+type Result_3 = 
+ variant {
+   err: text;
+   ok: nat;
+ };
+type Result_2 = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: BlockIndex;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok: bool;
+ };
 type Proof = 
  record {
    description: text;
@@ -74,5 +105,16 @@ type Campaign =
    status: CampaignStatus;
    target: nat;
    title: text;
+ };
+type BlockIndex = nat;
+type Account__1 = 
+ record {
+   owner: principal;
+   subaccount: opt blob;
+ };
+type Account = 
+ record {
+   owner: principal;
+   subaccount: opt blob;
  };
 service : () -> VeriFund

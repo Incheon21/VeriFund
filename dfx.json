@@ -1,9 +1,15 @@
 {
   "canisters": {
+    "icrc1_ledger_canister": {
+      "type": "custom",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/a17247bd86c7aa4e87742bf74d108614580f216d/rs/rosetta-api/icrc1/ledger/ledger.did",
+      "wasm": "https://download.dfinity.systems/ic/a17247bd86c7aa4e87742bf74d108614580f216d/canisters/ic-icrc1-ledger.wasm.gz"
+    },
     "backend": {
       "main": "backend/app.mo",
       "type": "motoko",
-      "args": "--enhanced-orthogonal-persistence"
+      "args": "--enhanced-orthogonal-persistence",
+      "dependencies": ["icrc1_ledger_canister"]
     },
     "frontend": {
       "dependencies": ["backend"],
@@ -19,7 +25,8 @@
       "specified_id": "rdmx6-jaaaa-aaaaa-aaadq-cai",
       "remote": {
         "id": {
-          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai",
+          "local": "rdmx6-jaaaa-aaaaa-aaadq-cai"
         }
       },
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"

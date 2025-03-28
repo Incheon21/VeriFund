@@ -2,6 +2,15 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export interface Account {
+  'owner' : Principal,
+  'subaccount' : [] | [Uint8Array | number[]],
+}
+export interface Account__1 {
+  'owner' : Principal,
+  'subaccount' : [] | [Uint8Array | number[]],
+}
+export type BlockIndex = bigint;
 export interface Campaign {
   'id' : string,
   'status' : CampaignStatus,
@@ -26,7 +35,16 @@ export interface Proof {
   'description' : string,
   'timestamp' : Time,
 }
+export type Result = { 'ok' : boolean } |
+  { 'err' : string };
+export type Result_1 = { 'ok' : BlockIndex } |
+  { 'err' : string };
+export type Result_2 = { 'ok' : string } |
+  { 'err' : string };
+export type Result_3 = { 'ok' : bigint } |
+  { 'err' : string };
 export type Time = bigint;
+export interface TransferArgs { 'toAccount' : Account, 'amount' : bigint }
 export interface VeriFund {
   'checkFileExists' : ActorMethod<[string], boolean>,
   'createCampaign' : ActorMethod<
@@ -36,8 +54,11 @@ export interface VeriFund {
   'deleteFile' : ActorMethod<[string], boolean>,
   'donate' : ActorMethod<[Principal, string, bigint], boolean>,
   'getAuditor' : ActorMethod<[string], [] | [Principal]>,
+  'getBalance' : ActorMethod<[Account__1], Result_3>,
+  'getCampaignAccount' : ActorMethod<[bigint], Account__1>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,
   'getCampaignsByUser' : ActorMethod<[Principal], Array<Campaign>>,
+  'getCanisterAccount' : ActorMethod<[], Account__1>,
   'getCertifiedData' : ActorMethod<[], Uint8Array | number[]>,
   'getDonationsByID' : ActorMethod<[string], Array<Donation>>,
   'getDonationsByUser' : ActorMethod<[Principal], Array<Donation>>,
@@ -53,9 +74,11 @@ export interface VeriFund {
   'getProofs' : ActorMethod<[string], Array<Proof>>,
   'getTotalChunks' : ActorMethod<[string], bigint>,
   'pickAuditor' : ActorMethod<[string], boolean>,
+  'recordDonation' : ActorMethod<[bigint, bigint], Result_2>,
   'releaseDecision' : ActorMethod<[string, boolean], boolean>,
   'stakeAsAuditor' : ActorMethod<[bigint], boolean>,
   'submitProof' : ActorMethod<[string, string, string], boolean>,
+  'transfer' : ActorMethod<[TransferArgs], Result_1>,
   'transform' : ActorMethod<
     [{ 'context' : Uint8Array | number[], 'response' : http_request_result }],
     http_request_result
@@ -64,6 +87,7 @@ export interface VeriFund {
     [string, Uint8Array | number[], bigint, string],
     undefined
   >,
+  'verifyTransaction' : ActorMethod<[BlockIndex], Result>,
   'whoami' : ActorMethod<[], Principal>,
 }
 export interface http_header { 'value' : string, 'name' : string }

@@ -18,6 +18,9 @@ import Timer "mo:base/Timer";
 import IC "ic:aaaaa-aa"; 
 import { phash; thash } "mo:map/Map";
 import HashMapMap "mo:map/Map";
+import Icrc1Ledger "canister:icrc1_ledger_canister";
+import Result "mo:base/Result";
+import Error "mo:base/Error";
 
 actor class VeriFund() = this {
 
@@ -60,6 +63,11 @@ actor class VeriFund() = this {
     description: Text;
     timestamp: Time.Time;
     verified: Bool;
+  };
+
+  type TransferArgs = {
+    amount : Nat;
+    toAccount : Icrc1Ledger.Account;
   };
 
   // STABLE MEMORY STORAGE
@@ -109,6 +117,115 @@ actor class VeriFund() = this {
         await remind();
       }
     );
+  };
+
+  // Types
+  type Account = Icrc1Ledger.Account;
+  type Subaccount = Icrc1Ledger.Subaccount;
+  type Tokens = Nat;
+  type Memo = Blob;
+  type Timestamp = Nat64;
+  type BlockIndex = Nat;
+  
+  // Get the account balance
+  public shared func getBalance(account : Account) : async Result.Result<Nat, Text> {
+    try {
+      let balance = await Icrc1Ledger.icrc1_balance_of(account);
+      #ok(balance)
+    } catch (error : Error) {
+      #err("Error getting balance: " # Error.message(error))
+    }
+  };
+  
+  // Get the default account for this canister
+  public func getCanisterAccount() : async Account {
+    {
+      owner = Principal.fromActor(this);
+      subaccount = null;
+    }
+  };
+  
+  // Create an account for a campaign
+  public func getCampaignAccount(campaignId : Nat) : async Account {
+    // You can use the campaignId to create a unique subaccount
+    // This is a simple example - you might want a more sophisticated approach
+    let subaccount = generateSubaccount(campaignId);
+    
+    {
+      owner = Principal.fromActor(this);
+      subaccount = ?subaccount;
+    }
+  };
+  
+  // Helper function to generate a subaccount from a campaign ID
+  private func generateSubaccount(campaignId : Nat) : Blob {
+    let idAsText = Nat.toText(campaignId);
+    let paddedId = Text.concat("0000000000000000000000000000000", idAsText);
+    
+    // Get the last 32 characters
+    let start = Text.size(paddedId) - 32;
+    let chars = Text.toIter(paddedId);
+    var i = 0;
+    var result = "";
+    
+    for (c in chars) {
+      if (i >= start) {
+        result := result # Text.fromChar(c);
+      };
+      i += 1;
+    };
+    
+    // Convert to blob
+    Text.encodeUtf8(result)
+  };
+  
+  // Transfer tokens from this canister to another account
+  public shared func transfer(args : TransferArgs) : async Result.Result<BlockIndex, Text> {
+    Debug.print(
+      "Transferring "
+      # debug_show (args.amount)
+      # " tokens to account"
+      # debug_show (args.toAccount)
+    );
+
+    let transferArgs : Icrc1Ledger.TransferArg = {
+      memo = null;
+      amount = args.amount;
+      from_subaccount = null;
+      fee = null;
+      to = args.toAccount;
+      created_at_time = null;
+    };
+
+    try {
+      let transferResult = await Icrc1Ledger.icrc1_transfer(transferArgs);
+      switch (transferResult) {
+        case (#Err(transferError)) {
+          return #err("Couldn't transfer funds:\n" # debug_show (transferError));
+        };
+        case (#Ok(blockIndex)) { return #ok blockIndex };
+      };
+    } catch (error : Error) {
+      return #err("Reject message: " # Error.message(error));
+    };
+  };
+  
+  // Record a donation after it has been verified
+  public shared({ caller }) func recordDonation(campaignId : Nat, amount : Nat) : async Result.Result<Text, Text> {
+    // Here you would:
+    // 1. Verify the transaction happened (by checking the ledger)
+    // 2. Update your campaign data to reflect the donation
+    // 3. Return success or failure
+    
+    // This is a placeholder implementation
+    #ok("Donation of " # Nat.toText(amount) # " recorded for campaign " # Nat.toText(campaignId))
+  };
+  
+  // Verify a transaction on the ledger
+  public func verifyTransaction(blockIndex : BlockIndex) : async Result.Result<Bool, Text> {
+    // In a real implementation, you would query the ledger to verify the transaction
+    // This is a placeholder
+    #ok(true)
   };
 
   // Certified data: returns a blob that represents certified state

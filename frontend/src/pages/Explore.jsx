@@ -39,17 +39,53 @@ export default function Explore() {
     }
   };
 
+  // const donateToCampaign = async (campaignId, amount) => {
+  //   try {
+  //     const result = await backendActor.donate(Principal.fromText(principal), campaignId, BigInt(amount));
+  //     if (result) {
+  //       setAlert({ type: "success", message: "Donation successful!" });
+  //       loadCampaigns();
+  //     } else {
+  //       setAlert({ type: "error", message: "Donation failed." });
+  //     }
+  //   } catch (error) {
+  //     setAlert({ type: "error", message: "Error during donation." });
+  //   }
+  // };
+
   const donateToCampaign = async (campaignId, amount) => {
     try {
-      const result = await backendActor.donate(Principal.fromText(principal), campaignId, BigInt(amount));
-      if (result) {
-        setAlert({ type: "success", message: "Donation successful!" });
-        loadCampaigns();
-      } else {
-        setAlert({ type: "error", message: "Donation failed." });
-      }
+      // Step 1: Get the campaign's account from your backend
+      const campaignAccountResponse = await backendActor.getCampaignAccount(campaignId);
+
+      // Step 2: Format the account for use with the ICRC-1 ledger
+      const campaignAccount = {
+        owner: campaignAccountResponse.owner,
+        subaccount: campaignAccountResponse.subaccount,
+      };
+
+      // Step 3: Open the NNS dapp for the user to complete the transfer
+      // This uses the NNS dapp URL format for pre-filling transfer information
+      const accountString = JSON.stringify(campaignAccount);
+      const encodedAccount = encodeURIComponent(accountString);
+      const nnsUrl = `https://nns.ic0.app/wallet/?recipient=${encodedAccount}&amount=${amount}`;
+
+      // Open in a new window
+      const transferWindow = window.open(nnsUrl, "_blank");
+
+      // Step 4: Show a notification to the user
+      setAlert({
+        type: "info",
+        message: "Please complete the transfer in the NNS dapp and return here to confirm your donation.",
+      });
+
+      // Step 5: Add a confirmation step after the user returns
+      // You could add a "Confirm Donation" button that appears after they return
+      // When clicked, it would call:
+      // await backendActor.recordDonation(campaignId, BigInt(amount));
     } catch (error) {
-      setAlert({ type: "error", message: "Error during donation." });
+      console.error("Error initiating donation:", error);
+      setAlert({ type: "error", message: `Error initiating donation: ${error.message}` });
     }
   };
 
