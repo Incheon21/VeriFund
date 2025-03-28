@@ -1,6 +1,6 @@
 type VeriFund = 
  service {
-   createCampaign: (text, text, text, nat) -> (bool);
+   createCampaign: (text, text, nat, Time) -> (bool);
    donate: (text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
    getCampaigns: () -> (vec Campaign) query;
@@ -38,6 +38,7 @@ type CampaignStatus =
 type Campaign = 
  record {
    collected: nat;
+   date: Time;
    description: text;
    id: text;
    owner: principal;

@@ -7,6 +7,7 @@ export interface Campaign {
   'status' : CampaignStatus,
   'title' : string,
   'owner' : Principal,
+  'date' : Time,
   'description' : string,
   'collected' : bigint,
   'target' : bigint,
@@ -27,7 +28,7 @@ export interface Proof {
 }
 export type Time = bigint;
 export interface VeriFund {
-  'createCampaign' : ActorMethod<[string, string, string, bigint], boolean>,
+  'createCampaign' : ActorMethod<[string, string, bigint, Time], boolean>,
   'donate' : ActorMethod<[string, bigint], boolean>,
   'getAuditor' : ActorMethod<[string], [] | [Principal]>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,

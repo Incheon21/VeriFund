@@ -1,4 +1,5 @@
 export const idlFactory = ({ IDL }) => {
+  const Time = IDL.Int;
   const CampaignStatus = IDL.Variant({
     'active' : IDL.Null,
     'released' : IDL.Null,
@@ -9,11 +10,11 @@ export const idlFactory = ({ IDL }) => {
     'status' : CampaignStatus,
     'title' : IDL.Text,
     'owner' : IDL.Principal,
+    'date' : Time,
     'description' : IDL.Text,
     'collected' : IDL.Nat,
     'target' : IDL.Nat,
   });
-  const Time = IDL.Int;
   const Donation = IDL.Record({
     'timestamp' : Time,
     'amount' : IDL.Nat,
@@ -27,7 +28,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const VeriFund = IDL.Service({
     'createCampaign' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Nat],
+        [IDL.Text, IDL.Text, IDL.Nat, Time],
         [IDL.Bool],
         [],
       ),
