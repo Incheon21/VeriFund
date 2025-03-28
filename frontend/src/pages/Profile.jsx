@@ -241,7 +241,7 @@ export default function Profile() {
                         onClick={handlePrevPageDonations}
                         disabled={currentPageDonations === 1}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-                        ⬅️ Prev
+                        Prev
                       </button>
                       <span>
                         Page {currentPageDonations} of {totalPagesDonations}
@@ -250,7 +250,7 @@ export default function Profile() {
                         onClick={handleNextPageDonations}
                         disabled={currentPageDonations === totalPagesDonations}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-                        Next ➡️
+                        Next
                       </button>
                     </div>
                   )}
