@@ -109,7 +109,7 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 | Transparent Donation Logs | All donation history is stored on-chain and publicly accessible.                            |
 | Certified Frontend Access | Ensures users are reading verified, non-fake data using **certified variables                |
 | Proof-of-Usage Upload     | Fundraisers upload external links or files as proof of how funds were used.                    |
-| Public Auditors**           | Each campaign randomly selects an auditor to review and approve usage reports.                 |
+| Public Auditors             | Each campaign randomly selects an auditor to review and approve usage reports.                 |
 | Staking + Reward Mechanism| Auditors stake ICP to be eligible. Honest auditors get rewards, lazy ones get penalized.       |
 | Reminder System (Timers)  | Daily on-chain reminders encourage fundraisers to submit proof.                                |
 | Live ICP/USD Conversion   | Uses HTTPS outcalls to Coinbase API for accurate pricing.                                  |
@@ -146,37 +146,64 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 - Node.js & NPM (https://nodejs.org)
 - Motoko Package Manager (Mops)
 
- 1. Install DFX CLI (macOS/Linux)
- ```bash
-sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
- ```
- 2. Install Mops (Motoko Package Manager)
- ```bash
- npm i -g ic-mops
+### 1. Install developer tools.
+
+You can install the developer tools natively or use Dev Containers.
+
+#### Option 1: Natively install developer tools
+
+> Installing `dfx` natively is currently only supported on macOS and Linux systems. On Windows, it is recommended to use the Dev Containers option.
+
+1. Install `dfx` with the following command:
+
 ```
 
- 3. Clone or enter your project
+sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+
+```
+
+> On Apple Silicon (e.g., Apple M1 chip), make sure you have Rosetta installed (`softwareupdate --install-rosetta`).
+
+2. [Install NodeJS](https://nodejs.org/en/download/package-manager).
+
+3. For Motoko projects, you will also need to:
+
+- Install the Motoko package manager [Mops](https://docs.mops.one/quick-start#2-install-mops-cli): 
+```bash
+npm i -g ic-mops
+```
+
+#### Option 2: Dev Containers
+
+Continue building your projects locally by installing the [Dev Container extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) for VS Code and [Docker](https://docs.docker.com/engine/install/).
+
+Make sure Docker is running, then navigate into your project's directory that you downloaded from ICP Ninja and start the Dev Container by selecting `Dev-Containers: Reopen in Container` in VS Code's command palette (F1 or Ctrl/Cmd+Shift+P).
+
+> Note that local development ports (e.g. the ports used by `dfx` or `vite`) are forwarded from the Dev Container to your local machine. In the VS code terminal, use Ctrl/Cmd+Click on the displayed local URLs to open them in your browser. To view the current port mappings, click the "Ports" tab in the VS Code terminal window.
+
+### 2. Clone or enter your project
  ```bash
-cd verifund/
+ https://github.com/Incheon21/verifund.git
+cd verifund
  ```
 
- 4. Start local DFX network
+### 3. Start local DFX network
  ``` bash
 dfx start --background
  ```
 
- 5. (Recommended) Create and switch to your dev identity
+### 4. (Recommended) Create and switch to your dev identity
   ```
 dfx identity new dev
 dfx identity use dev
  ```
 
- 6. Install frontend dependencies
+### 5. Install frontend dependencies
  ```
 npm install
  ```
 
- 7. Deploy canisters locally
+### 6. Deploy canisters locally
  ```
 dfx deploy
  ```
