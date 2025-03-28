@@ -28,11 +28,11 @@ export const idlFactory = ({ IDL }) => {
   });
   const VeriFund = IDL.Service({
     'createCampaign' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Nat, Time],
+        [IDL.Principal, IDL.Text, IDL.Text, IDL.Nat, Time],
         [IDL.Bool],
         [],
       ),
-    'donate' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Bool], []),
+    'donate' : IDL.Func([IDL.Principal, IDL.Text, IDL.Nat], [IDL.Bool], []),
     'getAuditor' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Principal)], ['query']),
     'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
     'getCampaignsByUser' : IDL.Func(

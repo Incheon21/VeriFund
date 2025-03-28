@@ -106,22 +106,22 @@ actor class VeriFund() = this {
     certifiedState
   };
 
-  stable var campaignCounter: Nat = 0; // Counter for unique IDs
+  stable var campaignCounter: Nat = 0; 
   
-  public shared(msg) func createCampaign(title: Text, description: Text, target: Nat, date:Time.Time): async Bool {
-      let id = "campaign_" # Nat.toText(campaignCounter); // Generate unique ID
-      campaignCounter += 1; // Increment the counter
+  public func createCampaign(owner:Principal, title: Text, description: Text, target: Nat, date:Time.Time): async Bool {
+      let id = "campaign_" # Nat.toText(campaignCounter);
+      campaignCounter += 1;
   
       if (Option.isSome(campaigns.get(id))) return false;
       campaigns.put(id, {
-        id; title; description; owner = msg.caller; target; collected = 0; status = #active; date;
+        id; title; description; owner; target; collected = 0; status = #active; date;
       });
       updateCertifiedData();
       return true;
   };
 
   // Donate ICP (mocked) to a specific campaign
-  public shared(msg) func donate(id: Text, amount: Nat): async Bool {
+  public func donate(donor:Principal, id: Text, amount: Nat): async Bool {
     switch (campaigns.get(id)) {
       case null return false;
       case (?camp) {
@@ -129,7 +129,7 @@ actor class VeriFund() = this {
         campaigns.put(id, { camp with collected = camp.collected + amount });
 
         let donation: Donation = {
-          donor = msg.caller;
+          donor;
           amount;
           timestamp = Time.now();
         };

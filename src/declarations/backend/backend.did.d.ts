@@ -28,8 +28,11 @@ export interface Proof {
 }
 export type Time = bigint;
 export interface VeriFund {
-  'createCampaign' : ActorMethod<[string, string, bigint, Time], boolean>,
-  'donate' : ActorMethod<[string, bigint], boolean>,
+  'createCampaign' : ActorMethod<
+    [Principal, string, string, bigint, Time],
+    boolean
+  >,
+  'donate' : ActorMethod<[Principal, string, bigint], boolean>,
   'getAuditor' : ActorMethod<[string], [] | [Principal]>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,
   'getCampaignsByUser' : ActorMethod<[Principal], Array<Campaign>>,

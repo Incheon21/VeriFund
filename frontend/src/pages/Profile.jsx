@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
 import { useAuth } from "../utils/auth";
+import { Principal } from "@dfinity/principal";
 
 // Create the backend actor. Adjust the host if needed.
 const backendActor = createActor(canisterId, {
@@ -16,7 +17,6 @@ const backendActor = createActor(canisterId, {
 
 export default function Profile() {
   const { principal } = useAuth();
-  console.log(principal);
   const [campaigns, setCampaigns] = useState([]);
   const [formData, setFormData] = useState({
     title: "",
@@ -33,6 +33,7 @@ export default function Profile() {
     e.preventDefault();
     try {
       const success = await backendActor.createCampaign(
+        Principal.fromText(principal),
         formData.title,
         formData.description,
         BigInt(formData.target),
@@ -51,8 +52,9 @@ export default function Profile() {
 
   const loadCampaigns = async () => {
     try {
-      const campaignsData = await backendActor.getCampaigns();
+      const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
       setCampaigns(campaignsData);
+      console.log(campaignsData);
     } catch (error) {
       console.error("Error loading campaigns:", error);
       alert("Error loading campaigns.");
@@ -61,7 +63,7 @@ export default function Profile() {
 
   useEffect(() => {
     loadCampaigns();
-  }, []);
+  }, [principal]);
 
   return (
     <div className="min-h-screen w-[100vw] bg-white text-gray-800">
@@ -155,6 +157,7 @@ export default function Profile() {
                     {camp.target.toString()}
                   </p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>
+                  <p>Owner: {camp.owner.toText()}</p>
                   <p>
                     Date:{" "}
                     {new Date(Number(camp.date) / 1_000_000).toLocaleDateString(
