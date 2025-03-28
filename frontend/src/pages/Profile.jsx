@@ -197,7 +197,7 @@ export default function Profile() {
                         onClick={handlePrevPageCampaigns}
                         disabled={currentPageCampaigns === 1}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-                        ⬅️ Prev
+                        Prev
                       </button>
                       <span>
                         Page {currentPageCampaigns} of {totalPagesCampaigns}
@@ -206,7 +206,7 @@ export default function Profile() {
                         onClick={handleNextPageCampaigns}
                         disabled={currentPageCampaigns === totalPagesCampaigns}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
-                        Next ➡️
+                        Next
                       </button>
                     </div>
                   )}
