@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
-import Alert from "../components/Alert";
+import Alert from "../../components/Alert";
 
 const backendActor = createActor(canisterId, {
   agentOptions: {
