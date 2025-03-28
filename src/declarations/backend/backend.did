@@ -11,7 +11,9 @@ type http_header =
  };
 type VeriFund = 
  service {
+   checkFileExists: (text) -> (bool);
    createCampaign: (principal, text, text, nat, Time) -> (bool);
+   deleteFile: (text) -> (bool);
    donate: (principal, text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
    getCampaigns: () -> (vec Campaign) query;
@@ -19,10 +21,18 @@ type VeriFund =
    getCertifiedData: () -> (blob) query;
    getDonationsByID: (text) -> (vec Donation) query;
    getDonationsByUser: (principal) -> (vec Donation) query;
+   getFileChunk: (text, nat) -> (opt blob);
+   getFileType: (text) -> (opt text);
+   getFiles: () -> (vec record {
+                          fileType: text;
+                          name: text;
+                          size: nat;
+                        });
    getICPUSD: () -> (text);
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
    getProofs: (text) -> (vec Proof) query;
+   getTotalChunks: (text) -> (nat);
    pickAuditor: (text) -> (bool);
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
@@ -31,6 +41,7 @@ type VeriFund =
                  context: blob;
                  response: http_request_result;
                }) -> (http_request_result) query;
+   uploadFileChunk: (text, blob, nat, text) -> ();
    whoami: () -> (principal) query;
  };
 type Time = int;

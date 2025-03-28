@@ -16,8 +16,8 @@ const Home = () => {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <h1 className="text-6xl font-bold tracking-widest">VeriFund</h1>
       <section className="w-full bg-blue-500 flex justify-center">
+        <h1 className="text-6xl font-bold tracking-widest">VeriFund</h1>
         <div className="relative flex w-full max-w-[1200px]">
           <img
             src="/home.png"

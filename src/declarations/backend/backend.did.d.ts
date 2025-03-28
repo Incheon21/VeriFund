@@ -28,10 +28,12 @@ export interface Proof {
 }
 export type Time = bigint;
 export interface VeriFund {
+  'checkFileExists' : ActorMethod<[string], boolean>,
   'createCampaign' : ActorMethod<
     [Principal, string, string, bigint, Time],
     boolean
   >,
+  'deleteFile' : ActorMethod<[string], boolean>,
   'donate' : ActorMethod<[Principal, string, bigint], boolean>,
   'getAuditor' : ActorMethod<[string], [] | [Principal]>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,
@@ -39,10 +41,17 @@ export interface VeriFund {
   'getCertifiedData' : ActorMethod<[], Uint8Array | number[]>,
   'getDonationsByID' : ActorMethod<[string], Array<Donation>>,
   'getDonationsByUser' : ActorMethod<[Principal], Array<Donation>>,
+  'getFileChunk' : ActorMethod<[string, bigint], [] | [Uint8Array | number[]]>,
+  'getFileType' : ActorMethod<[string], [] | [string]>,
+  'getFiles' : ActorMethod<
+    [],
+    Array<{ 'name' : string, 'size' : bigint, 'fileType' : string }>
+  >,
   'getICPUSD' : ActorMethod<[], string>,
   'getMyPendingCampaigns' : ActorMethod<[Principal], Array<string>>,
   'getMyStake' : ActorMethod<[Principal], bigint>,
   'getProofs' : ActorMethod<[string], Array<Proof>>,
+  'getTotalChunks' : ActorMethod<[string], bigint>,
   'pickAuditor' : ActorMethod<[string], boolean>,
   'releaseDecision' : ActorMethod<[string, boolean], boolean>,
   'stakeAsAuditor' : ActorMethod<[bigint], boolean>,
@@ -50,6 +59,10 @@ export interface VeriFund {
   'transform' : ActorMethod<
     [{ 'context' : Uint8Array | number[], 'response' : http_request_result }],
     http_request_result
+  >,
+  'uploadFileChunk' : ActorMethod<
+    [string, Uint8Array | number[], bigint, string],
+    undefined
   >,
   'whoami' : ActorMethod<[], Principal>,
 }

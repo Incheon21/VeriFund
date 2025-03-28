@@ -33,11 +33,13 @@ export const idlFactory = ({ IDL }) => {
     'headers' : IDL.Vec(http_header),
   });
   const VeriFund = IDL.Service({
+    'checkFileExists' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'createCampaign' : IDL.Func(
         [IDL.Principal, IDL.Text, IDL.Text, IDL.Nat, Time],
         [IDL.Bool],
         [],
       ),
+    'deleteFile' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'donate' : IDL.Func([IDL.Principal, IDL.Text, IDL.Nat], [IDL.Bool], []),
     'getAuditor' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Principal)], ['query']),
     'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
@@ -53,6 +55,25 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Donation)],
         ['query'],
       ),
+    'getFileChunk' : IDL.Func(
+        [IDL.Text, IDL.Nat],
+        [IDL.Opt(IDL.Vec(IDL.Nat8))],
+        [],
+      ),
+    'getFileType' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Text)], []),
+    'getFiles' : IDL.Func(
+        [],
+        [
+          IDL.Vec(
+            IDL.Record({
+              'name' : IDL.Text,
+              'size' : IDL.Nat,
+              'fileType' : IDL.Text,
+            })
+          ),
+        ],
+        [],
+      ),
     'getICPUSD' : IDL.Func([], [IDL.Text], []),
     'getMyPendingCampaigns' : IDL.Func(
         [IDL.Principal],
@@ -61,6 +82,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getMyStake' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
     'getProofs' : IDL.Func([IDL.Text], [IDL.Vec(Proof)], ['query']),
+    'getTotalChunks' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'pickAuditor' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'releaseDecision' : IDL.Func([IDL.Text, IDL.Bool], [IDL.Bool], []),
     'stakeAsAuditor' : IDL.Func([IDL.Nat], [IDL.Bool], []),
@@ -74,6 +96,11 @@ export const idlFactory = ({ IDL }) => {
         ],
         [http_request_result],
         ['query'],
+      ),
+    'uploadFileChunk' : IDL.Func(
+        [IDL.Text, IDL.Vec(IDL.Nat8), IDL.Nat, IDL.Text],
+        [],
+        [],
       ),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });

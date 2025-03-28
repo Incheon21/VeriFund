@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
-import Alert from "../components/Alert";
+import Alert from "../../components/Alert";
 
 const backendActor = createActor(canisterId, {
   agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
+    host:
+      process.env.DFX_NETWORK === "ic"
+        ? "https://ic0.app"
+        : "http://localhost:4943",
   },
 });
 
@@ -42,7 +45,13 @@ export default function CampaignDetails() {
   return (
     <div className="min-h-screen w-[100vw] bg-white text-gray-800">
       <main className="container mx-auto px-4 py-8">
-        {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+        {alert && (
+          <Alert
+            type={alert.type}
+            message={alert.message}
+            onClose={() => setAlert(null)}
+          />
+        )}
         <h1 className="text-3xl font-bold mb-4">{campaign.title}</h1>
         <p className="mb-4">{campaign.description}</p>
         <p className="mb-4">
@@ -69,7 +78,10 @@ export default function CampaignDetails() {
                   <strong>Amount:</strong> {donation.amount.toString()} ICP
                 </p>
                 <p>
-                  <strong>Timestamp:</strong> {new Date(Number(donation.timestamp / BigInt(1_000_000))).toLocaleString()}
+                  <strong>Timestamp:</strong>{" "}
+                  {new Date(
+                    Number(donation.timestamp / BigInt(1_000_000))
+                  ).toLocaleString()}
                 </p>
               </li>
             ))}

@@ -4,7 +4,7 @@ import Bool "mo:base/Bool";
 import CertifiedData "mo:base/CertifiedData";
 import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
-import HashMap "mo:base/HashMap";
+import HashMapBase "mo:base/HashMap";
 import Option "mo:base/Option";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
@@ -16,10 +16,26 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import IC "ic:aaaaa-aa"; 
+import { phash; thash } "mo:map/Map";
+import HashMapMap "mo:map/Map";
 
 actor class VeriFund() = this {
 
   // Types
+  type FileChunk = {
+    chunk : Blob;
+    index : Nat;
+  };
+
+  type File = {
+    name : Text;
+    chunks : [FileChunk];
+    totalSize : Nat;
+    fileType : Text;
+  };
+
+  type UserFiles = HashMapMap.Map<Text, File>;
+
   type CampaignStatus = { #active; #pending_release; #released };
 
   type Campaign = {
@@ -54,15 +70,16 @@ actor class VeriFund() = this {
   stable var auditorsStore : [(Text, Principal)] = [];
   stable var certifiedState : Blob = Blob.fromArray([]);
 
-  // WORKING HASHMAPs
-  var campaigns : HashMap.HashMap<Text, Campaign> = HashMap.fromIter<Text, Campaign>(campaignsStore.vals(), 0, Text.equal, Text.hash);
-  var donations : HashMap.HashMap<Text, [Donation]> = HashMap.fromIter<Text, [Donation]>(donationsStore.vals(), 0, Text.equal, Text.hash);
-  var proofs : HashMap.HashMap<Text, [Proof]> = HashMap.fromIter<Text, [Proof]>(proofsStore.vals(), 0, Text.equal, Text.hash);
-  var stakes : HashMap.HashMap<Principal, Nat> = HashMap.fromIter<Principal, Nat>(stakesStore.vals(), 0, Principal.equal, Principal.hash);
-  var auditors : HashMap.HashMap<Text, Principal> = HashMap.fromIter<Text, Principal>(auditorsStore.vals(), 0, Text.equal, Text.hash);
+  // WORKING HASHMAPBases
+  var files = HashMapMap.new<Principal, UserFiles>();
+  var campaigns : HashMapBase.HashMap<Text, Campaign> = HashMapBase.fromIter<Text, Campaign>(campaignsStore.vals(), 0, Text.equal, Text.hash);
+  var donations : HashMapBase.HashMap<Text, [Donation]> = HashMapBase.fromIter<Text, [Donation]>(donationsStore.vals(), 0, Text.equal, Text.hash);
+  var proofs : HashMapBase.HashMap<Text, [Proof]> = HashMapBase.fromIter<Text, [Proof]>(proofsStore.vals(), 0, Text.equal, Text.hash);
+  var stakes : HashMapBase.HashMap<Principal, Nat> = HashMapBase.fromIter<Principal, Nat>(stakesStore.vals(), 0, Principal.equal, Principal.hash);
+  var auditors : HashMapBase.HashMap<Text, Principal> = HashMapBase.fromIter<Text, Principal>(auditorsStore.vals(), 0, Text.equal, Text.hash);
   
   // Per-user reminder storage
-  var reminderFlags : HashMap.HashMap<Principal, [Text]> = HashMap.HashMap<Principal, [Text]>(0, Principal.equal, Principal.hash);
+  var reminderFlags : HashMapBase.HashMap<Principal, [Text]> = HashMapBase.HashMap<Principal, [Text]>(0, Principal.equal, Principal.hash);
 
   // Serialize before upgrade (to stable memory)
   system func preupgrade() {
@@ -73,13 +90,13 @@ actor class VeriFund() = this {
     auditorsStore := Iter.toArray(auditors.entries());
   };
 
-  // Restore after upgrade (to working hashmaps) + start reminder timer
+  // Restore after upgrade (to working hashmapBases) + start reminder timer
   system func postupgrade() {
-    campaigns := HashMap.fromIter(campaignsStore.vals(), 0, Text.equal, Text.hash);
-    donations := HashMap.fromIter(donationsStore.vals(), 0, Text.equal, Text.hash);
-    proofs := HashMap.fromIter(proofsStore.vals(), 0, Text.equal, Text.hash);
-    stakes := HashMap.fromIter(stakesStore.vals(), 0, Principal.equal, Principal.hash);
-    auditors := HashMap.fromIter(auditorsStore.vals(), 0, Text.equal, Text.hash);
+    campaigns := HashMapBase.fromIter(campaignsStore.vals(), 0, Text.equal, Text.hash);
+    donations := HashMapBase.fromIter(donationsStore.vals(), 0, Text.equal, Text.hash);
+    proofs := HashMapBase.fromIter(proofsStore.vals(), 0, Text.equal, Text.hash);
+    stakes := HashMapBase.fromIter(stakesStore.vals(), 0, Principal.equal, Principal.hash);
+    auditors := HashMapBase.fromIter(auditorsStore.vals(), 0, Text.equal, Text.hash);
 
     let nowSec : Nat = Int.abs(Time.now() / 1_000_000_000);
     let daily : Nat = 86400;
@@ -207,7 +224,7 @@ actor class VeriFund() = this {
 
   // Reminder logic run daily — updates reminderFlags per fundraiser
   private func remind() : async () {
-    reminderFlags := HashMap.HashMap<Principal, [Text]>(0, Principal.equal, Principal.hash);
+    reminderFlags := HashMapBase.HashMap<Principal, [Text]>(0, Principal.equal, Principal.hash);
     for ((id, camp) in campaigns.entries()) {
       if (camp.status == #pending_release) {
         let existing = Option.get(reminderFlags.get(camp.owner), []);
@@ -331,6 +348,100 @@ actor class VeriFund() = this {
 
   public query (message) func whoami() : async Principal {
     message.caller;
+  };
+
+  //File Vault
+    // Return files associated with a user's principal.
+  private func getUserFiles(user : Principal) : UserFiles {
+    switch (HashMapMap.get(files, phash, user)) {
+      case null {
+        let newFileMap = HashMapMap.new<Text, File>();
+        let _ = HashMapMap.put(files, phash, user, newFileMap);
+        newFileMap;
+      };
+      case (?existingFiles) existingFiles;
+    };
+  };
+
+  // Check if a file name already exists for the user.
+  public shared (msg) func checkFileExists(name : Text) : async Bool {
+    Option.isSome(HashMapMap.get(getUserFiles(msg.caller), thash, name));
+  };
+
+  // Upload a file in chunks.
+  public shared (msg) func uploadFileChunk(name : Text, chunk : Blob, index : Nat, fileType : Text) : async () {
+    let userFiles = getUserFiles(msg.caller);
+    let fileChunk = { chunk = chunk; index = index };
+
+    switch (HashMapMap.get(userFiles, thash, name)) {
+      case null {
+        let _ = HashMapMap.put(userFiles, thash, name, { name = name; chunks = [fileChunk]; totalSize = chunk.size(); fileType = fileType });
+      };
+      case (?existingFile) {
+        let updatedChunks = Array.append(existingFile.chunks, [fileChunk]);
+        let _ = HashMapMap.put(
+          userFiles,
+          thash,
+          name,
+          {
+            name = name;
+            chunks = updatedChunks;
+            totalSize = existingFile.totalSize + chunk.size();
+            fileType = fileType;
+          }
+        );
+      };
+    };
+  };
+
+  // Return list of files for a user.
+  public shared (msg) func getFiles() : async [{ name : Text; size : Nat; fileType : Text }] {
+    Iter.toArray(
+      Iter.map(
+        HashMapMap.vals(getUserFiles(msg.caller)),
+        func(file : File) : { name : Text; size : Nat; fileType : Text } {
+          {
+            name = file.name;
+            size = file.totalSize;
+            fileType = file.fileType;
+          };
+        }
+      )
+    );
+  };
+
+  // Return total chunks for a file
+  public shared (msg) func getTotalChunks(name : Text) : async Nat {
+    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
+      case null 0;
+      case (?file) file.chunks.size();
+    };
+  };
+
+  // Return specific chunk for a file.
+  public shared (msg) func getFileChunk(name : Text, index : Nat) : async ?Blob {
+    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
+      case null null;
+      case (?file) {
+        switch (Array.find(file.chunks, func(chunk : FileChunk) : Bool { chunk.index == index })) {
+          case null null;
+          case (?foundChunk) ?foundChunk.chunk;
+        };
+      };
+    };
+  };
+
+  // Get file's type.
+  public shared (msg) func getFileType(name : Text) : async ?Text {
+    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
+      case null null;
+      case (?file) ?file.fileType;
+    };
+  };
+
+  // Delete a file.
+  public shared (msg) func deleteFile(name : Text) : async Bool {
+    Option.isSome(HashMapMap.remove(getUserFiles(msg.caller), thash, name));
   };
 };
 
