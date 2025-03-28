@@ -52,7 +52,9 @@ export default function Profile() {
 
   const loadCampaigns = async () => {
     try {
-      const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
+      const campaignsData = await backendActor.getCampaignsByUser(
+        Principal.fromText(principal)
+      );
       setCampaigns(campaignsData);
       console.log(campaignsData);
     } catch (error) {

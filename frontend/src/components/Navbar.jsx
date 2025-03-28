@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { useAuth } from '../utils/auth';
+import React, { useState } from "react";
+import { useAuth } from "../utils/auth";
 import { NavLink } from "react-router";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { principal, isAuthenticated, login, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const navigate = useNavigate();
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -15,14 +16,45 @@ const Navbar = () => {
       <h1 className="text-xl font-bold">VeriFund</h1>
       <div className="gap-4 relative flex flex-row items-center justify-center">
         <div className="gap-4 flex flex-row items-center justify-center">
-          <NavLink to="/" className="hover:underline">Home</NavLink>
-          <NavLink to="" className="hover:underline">About</NavLink>
-          <NavLink to="/explore" className="hover:underline">Explore</NavLink>
+          <NavLink
+            to="/"
+            className="hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+              setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }, 100);
+            }}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/"
+            className="hover:underline"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate("/");
+              setTimeout(() => {
+                const element = document.getElementById("about-section");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }, 100);
+            }}
+          >
+            About
+          </NavLink>
+          <NavLink to="/explore" className="hover:underline">
+            Explore
+          </NavLink>
         </div>
         {isAuthenticated ? (
           <div clas>
             <button
-              className={` ${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-2`}
+              className={` ${
+                dropdownOpen ? "bg-black" : "bg-transparent"
+              } hover:bg-black rounded-full text-white font-bold p-2`}
               onClick={toggleDropdown}
             >
               <img src="/profile.png" className="w-8 h-8 rounded-full" />

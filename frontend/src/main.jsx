@@ -10,9 +10,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <div className="flex flex-col h-screen w-[100vw] bg-white">
+        <div className="flex flex-col w-full h-screen bg-white">
           <Navbar />
-          <main className="flex-grow flex items-center justify-center pt-32">
+          <main className="flex-grow flex w-full items-center justify-center mt-20">
             <App />
           </main>
         </div>

@@ -1,3 +1,14 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
 type VeriFund = 
  service {
    createCampaign: (principal, text, text, nat, Time) -> (bool);
@@ -8,6 +19,7 @@ type VeriFund =
    getCertifiedData: () -> (blob) query;
    getDonationsByID: (text) -> (vec Donation) query;
    getDonationsByUser: (principal) -> (vec Donation) query;
+   getICPUSD: () -> (text);
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
    getProofs: (text) -> (vec Proof) query;
@@ -15,6 +27,10 @@ type VeriFund =
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
    submitProof: (text, text, text) -> (bool);
+   transform: (record {
+                 context: blob;
+                 response: http_request_result;
+               }) -> (http_request_result) query;
    whoami: () -> (principal) query;
  };
 type Time = int;

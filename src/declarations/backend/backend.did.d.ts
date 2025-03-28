@@ -39,6 +39,7 @@ export interface VeriFund {
   'getCertifiedData' : ActorMethod<[], Uint8Array | number[]>,
   'getDonationsByID' : ActorMethod<[string], Array<Donation>>,
   'getDonationsByUser' : ActorMethod<[Principal], Array<Donation>>,
+  'getICPUSD' : ActorMethod<[], string>,
   'getMyPendingCampaigns' : ActorMethod<[Principal], Array<string>>,
   'getMyStake' : ActorMethod<[Principal], bigint>,
   'getProofs' : ActorMethod<[string], Array<Proof>>,
@@ -46,7 +47,17 @@ export interface VeriFund {
   'releaseDecision' : ActorMethod<[string, boolean], boolean>,
   'stakeAsAuditor' : ActorMethod<[bigint], boolean>,
   'submitProof' : ActorMethod<[string, string, string], boolean>,
+  'transform' : ActorMethod<
+    [{ 'context' : Uint8Array | number[], 'response' : http_request_result }],
+    http_request_result
+  >,
   'whoami' : ActorMethod<[], Principal>,
+}
+export interface http_header { 'value' : string, 'name' : string }
+export interface http_request_result {
+  'status' : bigint,
+  'body' : Uint8Array | number[],
+  'headers' : Array<http_header>,
 }
 export interface _SERVICE extends VeriFund {}
 export declare const idlFactory: IDL.InterfaceFactory;

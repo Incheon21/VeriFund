@@ -15,59 +15,102 @@ const Home = () => {
   const { isAuthenticated, principal, whoami } = useAuth();
 
   return (
-    <div className="container w-[80%] flex flex-col items-center justify-center">
-      <section className="relative flex w-full">
+    <div className="w-full flex flex-col items-center">
+      <h1 className="text-6xl font-bold tracking-widest">VeriFund</h1>
+      <section className="relative w-full flex max-w-[1200px] bg-blue-500">
         <img
           src="/home.png"
           alt="CisliNinja Platform Banner"
           className="w-full h-auto rounded-lg shadow-md"
         />
         <div className="absolute bottom-0 right-0 text-center p-12">
-          <h1 className="text-[48px] font-bold text-white mb-4">Empower Your Event, Amplify Your Cause</h1>
+          <p className="text-[48px] font-bold text-white mb-4">
+            Empower Your Event, Amplify Your Cause
+          </p>
         </div>
       </section>
-      <h1 className="text-2xl font-bold mb-4">Who Are You?</h1>
-      <div className="bg-gray-100 p-4 mb-4 rounded-md">
-        <div>
-          <p className="mb-2">
-            <i className="fas fa-info-circle"></i> A <strong>principal</strong>{" "}
-            is a unique identifier in the Internet Computer ecosystem.
-          </p>
-          <p className="mb-2">
-            It represents an entity (user, canister smart contract, or other)
-            and is used for identification and authorization purposes.
-          </p>
-          <p className="mb-2">
-            In this example, click "Whoami" to find out the principal ID with
-            which you're interacting with the backend. If you're not signed in,
-            you will see that you're using the so-called anonymous principal,
-            "2vxsx-fae".
-          </p>
-          <p className="mb-2">
-            After you've logged in with Internet Identity, you'll see a longer
-            principal, which is unique to your identity and the dapp you're
-            using.
-          </p>
+      <section className="flex max-w-[1200px] flex-col bg-yellow-500">
+        <h2 className="text-2xl font-bold mb-4">Who Are You?</h2>
+        <div className="bg-gray-100 p-4 mb-4 rounded-md">
+          <div>
+            <p className="mb-2">
+              <i className="fas fa-info-circle"></i> A{" "}
+              <strong>principal</strong> is a unique identifier in the Internet
+              Computer ecosystem.
+            </p>
+            <p className="mb-2">
+              It represents an entity (user, canister smart contract, or other)
+              and is used for identification and authorization purposes.
+            </p>
+            <p className="mb-2">
+              In this example, click "Whoami" to find out the principal ID with
+              which you're interacting with the backend. If you're not signed
+              in, you will see that you're using the so-called anonymous
+              principal, "2vxsx-fae".
+            </p>
+            <p className="mb-2">
+              After you've logged in with Internet Identity, you'll see a longer
+              principal, which is unique to your identity and the dapp you're
+              using.
+            </p>
+          </div>
         </div>
-      </div>
 
-      <Button onClick={whoami} className="mb-4">
-        Whoami
-      </Button>
+        <Button onClick={whoami} className="mb-4">
+          Whoami
+        </Button>
 
-      {principal && (
+        {principal && (
+          <div className="mt-4">
+            <h3 className="text-xl font-bold">Your principal ID is:</h3>
+            <p className="text-lg bg-gray-100 p-2 mt-2 rounded break-all">
+              {principal}
+            </p>
+          </div>
+        )}
+
         <div className="mt-4">
-          <h2 className="text-xl font-bold">Your principal ID is:</h2>
-          <h4 className="text-lg bg-gray-100 p-2 mt-2 rounded break-all">
-            {principal}
-          </h4>
+          <h3 className="font-bold">Authentication Status:</h3>
+          <p>{isAuthenticated ? "Logged In" : "Not Logged In"}</p>
         </div>
-      )}
+      </section>
 
-      <div className="mt-4">
-        <h3 className="font-bold">Authentication Status:</h3>
-        <p>{isAuthenticated ? "Logged In" : "Not Logged In"}</p>
-      </div>
+      <section
+        id="about-section"
+        className="about-section bg-red-500 py-20 w-full max-w-[1200px] flex flex-col items-center gap-10 px-6"
+      >
+        <h2 className="text-4xl font-bold">About VeriFund</h2>
+        <div className="w-full flex flex-col">
+          <p>
+            <span className="font-bold">VeriFund</span> is a decentralized,
+            trustless platform built to revolutionize how people give. Powered
+            by the Internet Computer, VeriFund allows anyone to create or
+            contribute to donation campaigns with transparency, verifiability,
+            and global accessibility.
+          </p>
+          <p>
+            Every donation is stored on-chain, publicly auditable, and protected
+            by smart contract rules — ensuring that funds are not only received,
+            but responsibly used. With a unique proof-of-donation and
+            proof-of-usage model, VeriFund builds a culture of accountability
+            without compromise.
+          </p>
+        </div>
+        <div className="w-full flex flex-col">
+          <h3 className="text-2xl">Vision</h3>
+          <p>
+            To create a borderless, trustless, and transparent giving ecosystem
+            where every donation is secure, verifiable, and meaningful.
+          </p>
+        </div>
+        <div className="w-full flex flex-col">
+          <h3 className="text-2xl">Mission</h3>
+          <p>1. Make donations verifiable</p>
+          <p>2. Break down global donation barriers</p>
+          <p>3. Establish trust through blockchain technology</p>
+          <p>4. Reward responsible fundraisers and auditors</p>
+        </div>
+      </section>
     </div>
   );
 };

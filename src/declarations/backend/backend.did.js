@@ -26,6 +26,12 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'timestamp' : Time,
   });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
   const VeriFund = IDL.Service({
     'createCampaign' : IDL.Func(
         [IDL.Principal, IDL.Text, IDL.Text, IDL.Nat, Time],
@@ -47,6 +53,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Donation)],
         ['query'],
       ),
+    'getICPUSD' : IDL.Func([], [IDL.Text], []),
     'getMyPendingCampaigns' : IDL.Func(
         [IDL.Principal],
         [IDL.Vec(IDL.Text)],
@@ -58,6 +65,16 @@ export const idlFactory = ({ IDL }) => {
     'releaseDecision' : IDL.Func([IDL.Text, IDL.Bool], [IDL.Bool], []),
     'stakeAsAuditor' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'submitProof' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
+    'transform' : IDL.Func(
+        [
+          IDL.Record({
+            'context' : IDL.Vec(IDL.Nat8),
+            'response' : http_request_result,
+          }),
+        ],
+        [http_request_result],
+        ['query'],
+      ),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
   return VeriFund;

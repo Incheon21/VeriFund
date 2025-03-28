@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Bool "mo:base/Bool";
 import CertifiedData "mo:base/CertifiedData";
+import Cycles "mo:base/ExperimentalCycles";
 import Debug "mo:base/Debug";
 import HashMap "mo:base/HashMap";
 import Option "mo:base/Option";
@@ -14,7 +15,7 @@ import Random "mo:base/Random";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
-
+import IC "ic:aaaaa-aa"; 
 
 actor class VeriFund() = this {
 
@@ -214,6 +215,54 @@ actor class VeriFund() = this {
         Debug.print("Reminder flagged for: " # Principal.toText(camp.owner));
       };
     };
+  };
+
+// This transform function is required for HTTPS outcalls to strip headers.
+  public query func transform({
+    context : Blob;
+    response : IC.http_request_result;
+  }) : async IC.http_request_result {
+    {
+      response with headers = [];
+    };
+  };
+
+  public func getICPUSD() : async Text {
+    let host : Text = "api.exchange.coinbase.com";
+    let url = "https://" # host # "/products/ICP-USD/ticker";
+    let request_headers = [
+      { name = "User-Agent"; value = "price-feed" },
+    ];
+
+    let http_request : IC.http_request_args = {
+      url = url;
+      max_response_bytes = null;
+      headers = request_headers;
+      body = null;
+      method = #get;
+      transform = ?{
+        function = transform;
+        context = Blob.fromArray([]);
+      };
+    };
+
+    Cycles.add<system>(230_000_000_000);
+    let http_response : IC.http_request_result = await IC.http_request(http_request);
+
+    let decoded_text : Text = switch (Text.decodeUtf8(http_response.body)) {
+      case null { "No value returned" };
+      case (?y) { y };
+    };
+
+    let partsArr = Iter.toArray(Text.split(decoded_text, #text "\"price\":\""));
+    if (partsArr.size() < 2) return " Unavailable ";
+    let after_price = partsArr[1];
+
+    let quoteArr = Iter.toArray(Text.split(after_price, #text "\""));
+    if (quoteArr.size() < 1) return " Unavailable ";
+    let price_str = quoteArr[0];
+
+    return price_str;
   };
 
   // Returns campaigns that the specified user must submit proof for (used in frontend)
