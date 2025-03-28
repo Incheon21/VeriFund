@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
+import Alert from "../components/Alert";
 
-// Create the backend actor
 const backendActor = createActor(canisterId, {
   agentOptions: {
     host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
@@ -14,6 +14,7 @@ export default function CampaignDetails() {
   const { id } = useParams(); // Get the campaign ID from the URL
   const [campaign, setCampaign] = useState(null);
   const [donations, setDonations] = useState([]);
+  const [alert, setAlert] = useState(null);
 
   // Fetch campaign details
   const loadCampaignDetails = async () => {
@@ -26,7 +27,7 @@ export default function CampaignDetails() {
       setDonations(donationsData);
     } catch (error) {
       console.error("Error loading campaign details:", error);
-      alert("Error loading campaign details.");
+      setAlert({ type: "error", message: "Error loading campaign details." });
     }
   };
 
@@ -41,6 +42,7 @@ export default function CampaignDetails() {
   return (
     <div className="min-h-screen w-[100vw] bg-white text-gray-800">
       <main className="container mx-auto px-4 py-8">
+        {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
         <h1 className="text-3xl font-bold mb-4">{campaign.title}</h1>
         <p className="mb-4">{campaign.description}</p>
         <p className="mb-4">
