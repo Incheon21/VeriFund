@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
-// Import the createActor helper and canisterId from your generated declarations
 import { createActor } from "declarations/backend";
 import { canisterId } from "declarations/backend/index.js";
 import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 
-// Create the backend actor. Adjust the host if needed.
 const backendActor = createActor(canisterId, {
   agentOptions: {
-    host:
-      process.env.DFX_NETWORK === "ic"
-        ? "https://ic0.app"
-        : "http://localhost:4943",
+    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
   },
 });
 
@@ -24,9 +19,20 @@ export default function Profile() {
     target: "",
     date: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const totalPages = Math.ceil(campaigns.length / 3);
+  const paginatedCampaigns = campaigns.slice((currentPage - 1) * 3, currentPage * 3);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
   const createCampaign = async (e) => {
@@ -51,13 +57,15 @@ export default function Profile() {
   };
 
   const loadCampaigns = async () => {
-    try {
-      const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
-      setCampaigns(campaignsData);
-      console.log(campaignsData);
-    } catch (error) {
-      console.error("Error loading campaigns:", error);
-      alert("Error loading campaigns.");
+    if (principal) {
+      try {
+        const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
+        setCampaigns(campaignsData);
+        console.log(campaignsData);
+      } catch (error) {
+        console.error("Error loading campaigns:", error);
+        alert("Error loading campaigns.");
+      }
     }
   };
 
@@ -103,9 +111,7 @@ export default function Profile() {
                 />
               </div>
               <div>
-                <label className="block font-semibold mb-1">
-                  Target (in ICP):
-                </label>
+                <label className="block font-semibold mb-1">Target (in ICP):</label>
                 <input
                   type="number"
                   name="target"
@@ -127,10 +133,7 @@ export default function Profile() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition"
-              >
+              <button type="submit" className="px-4 py-2 bg-[#12A3ED] text-white rounded hover:bg-[#0d9b8c] transition">
                 Create
               </button>
             </form>
@@ -145,33 +148,45 @@ export default function Profile() {
             <p>No campaigns available. Click "Load Campaigns" to fetch data.</p>
           ) : (
             <ul>
-              {campaigns.map((camp, index) => (
-                <li
-                  key={index}
-                  className="mb-2 shadow-md border border-gray-200 rounded-xl p-6"
-                >
+              {paginatedCampaigns.map((camp, index) => (
+                <li key={index} className="mb-2 shadow-md border border-gray-200 rounded-xl p-6">
                   <p className="font-bold text-3xl">{camp.title}</p>
                   <p>{camp.description}</p>
                   <p>
-                    Collected: {camp.collected.toString()} / Target:{" "}
-                    {camp.target.toString()}
+                    Collected: {camp.collected.toString()} / Target: {camp.target.toString()}
                   </p>
                   <p>Status: {Object.keys(camp.status)[0]}</p>
                   <p>Owner: {camp.owner.toText()}</p>
                   <p>
                     Date:{" "}
-                    {new Date(Number(camp.date) / 1_000_000).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
+                    {new Date(Number(camp.date) / 1_000_000).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
                   </p>
                 </li>
               ))}
             </ul>
+          )}
+          {campaigns.length > 3 && (
+            <div className="flex items-center justify-center mt-4 space-x-4">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
+                Prev
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
+                Next
+              </button>
+            </div>
           )}
         </section>
       </main>
