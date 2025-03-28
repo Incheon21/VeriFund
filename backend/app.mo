@@ -47,6 +47,7 @@ actor class VeriFund() = this {
     collected: Nat;
     status: CampaignStatus;
     date: Time.Time;
+    file: ?File; // Store the actual File object
   };
 
   type Donation = {
@@ -55,17 +56,9 @@ actor class VeriFund() = this {
     timestamp: Time.Time;
   };
 
-  type Proof = {
-    url: Text;
-    description: Text;
-    timestamp: Time.Time;
-    verified: Bool;
-  };
-
   // STABLE MEMORY STORAGE
   stable var campaignsStore : [(Text, Campaign)] = [];
   stable var donationsStore : [(Text, [Donation])] = [];
-  stable var proofsStore : [(Text, [Proof])] = [];
   stable var stakesStore : [(Principal, Nat)] = [];
   stable var auditorsStore : [(Text, Principal)] = [];
   stable var certifiedState : Blob = Blob.fromArray([]);
@@ -74,7 +67,6 @@ actor class VeriFund() = this {
   var files = HashMapMap.new<Principal, UserFiles>();
   var campaigns : HashMapBase.HashMap<Text, Campaign> = HashMapBase.fromIter<Text, Campaign>(campaignsStore.vals(), 0, Text.equal, Text.hash);
   var donations : HashMapBase.HashMap<Text, [Donation]> = HashMapBase.fromIter<Text, [Donation]>(donationsStore.vals(), 0, Text.equal, Text.hash);
-  var proofs : HashMapBase.HashMap<Text, [Proof]> = HashMapBase.fromIter<Text, [Proof]>(proofsStore.vals(), 0, Text.equal, Text.hash);
   var stakes : HashMapBase.HashMap<Principal, Nat> = HashMapBase.fromIter<Principal, Nat>(stakesStore.vals(), 0, Principal.equal, Principal.hash);
   var auditors : HashMapBase.HashMap<Text, Principal> = HashMapBase.fromIter<Text, Principal>(auditorsStore.vals(), 0, Text.equal, Text.hash);
   
@@ -85,7 +77,6 @@ actor class VeriFund() = this {
   system func preupgrade() {
     campaignsStore := Iter.toArray(campaigns.entries());
     donationsStore := Iter.toArray(donations.entries());
-    proofsStore := Iter.toArray(proofs.entries());
     stakesStore := Iter.toArray(stakes.entries());
     auditorsStore := Iter.toArray(auditors.entries());
   };
@@ -94,7 +85,6 @@ actor class VeriFund() = this {
   system func postupgrade() {
     campaigns := HashMapBase.fromIter(campaignsStore.vals(), 0, Text.equal, Text.hash);
     donations := HashMapBase.fromIter(donationsStore.vals(), 0, Text.equal, Text.hash);
-    proofs := HashMapBase.fromIter(proofsStore.vals(), 0, Text.equal, Text.hash);
     stakes := HashMapBase.fromIter(stakesStore.vals(), 0, Principal.equal, Principal.hash);
     auditors := HashMapBase.fromIter(auditorsStore.vals(), 0, Text.equal, Text.hash);
 
@@ -126,16 +116,105 @@ actor class VeriFund() = this {
 
   stable var campaignCounter: Nat = 0; 
   
-  public func createCampaign(owner:Principal, title: Text, description: Text, target: Nat, date:Time.Time): async Bool {
-      let id = "campaign_" # Nat.toText(campaignCounter);
-      campaignCounter += 1;
-  
-      if (Option.isSome(campaigns.get(id))) return false;
-      campaigns.put(id, {
-        id; title; description; owner; target; collected = 0; status = #active; date;
-      });
-      updateCertifiedData();
+  public func createCampaign(owner: Principal, title: Text, description: Text, target: Nat, date:Time.Time): async Bool {
+    let id = "campaign_" # Nat.toText(campaignCounter);
+    campaignCounter += 1;
+
+    if (Option.isSome(campaigns.get(id))) return false;
+    campaigns.put(id, {
+      id; title; description; owner; target; collected = 0; status = #active; date; file = null;
+    });
+    updateCertifiedData();
+    return true;
+  };
+
+public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Blob, index: Nat, fileType: Text) : async Bool {
+  switch (campaigns.get(id)) {
+    case (?camp) {
+      if (camp.owner != owner) return false;
+
+      let fileChunk = { chunk = chunk; index = index };
+      let updatedFile = {
+        name;
+        chunks = if (index == 0) [fileChunk] else Array.append(
+          Option.get(camp.file, { name = ""; chunks = []; totalSize = 0; fileType = "" }).chunks, 
+          [fileChunk]
+        );
+        totalSize = if (index == 0) chunk.size() else (
+          Option.get(camp.file, { name = ""; chunks = []; totalSize = 0; fileType = "" }).totalSize + chunk.size()
+        );
+        fileType;
+      };
+
+      campaigns.put(id, { camp with file = ?updatedFile });
       return true;
+    };
+    case null return false;
+  };
+};
+
+  public  func deleteCampaignFile(owner: Principal, id: Text, name: Text) : async Bool {
+    switch (campaigns.get(id)) {
+      case (?camp) {
+        if (camp.owner != owner) return false;
+        
+        switch (camp.file) {
+          case (?file) {
+            if (file.name == name) {
+              campaigns.put(id, { camp with file = null });
+              return true;
+            };
+            return false;
+          };
+          case null return false;
+        };
+      };
+      case null return false;
+    };
+  };
+
+  public query func getCampaignFileTotalChunks(id: Text) : async Nat {
+    switch (campaigns.get(id)) {
+      case (?camp) {
+        switch (camp.file) {
+          case (?file) file.chunks.size();
+          case null 0;
+        };
+      };
+      case null 0;
+    };
+  };
+
+  public query func getCampaignFileChunk(id: Text, index: Nat) : async ?Blob {
+    switch (campaigns.get(id)) {
+      case (?camp) {
+        switch (camp.file) {
+          case (?file) {
+            let chunk = Array.find(file.chunks, func(chunk : FileChunk) : Bool { 
+              chunk.index == index 
+            });
+            switch (chunk) {
+              case (?foundChunk) ?foundChunk.chunk;
+              case null null;
+            };
+          };
+          case null null;
+        };
+      };
+      case null null;
+    };
+  };
+
+  public query func getCampaignFileType(id: Text) : async ?Text {
+    switch (campaigns.get(id)) {
+      case (?camp) {
+        switch (camp.file) {
+          case (?file) ?file.fileType;
+          case null null;
+        };
+      };
+      case null null;
+    };
   };
 
   // Donate ICP (mocked) to a specific campaign
@@ -161,28 +240,6 @@ actor class VeriFund() = this {
         return true;
       };
     };
-  };
-
-  // Submit external proof for usage of funds (Fundraiser role)
-  public shared(_) func submitProof(id: Text, url: Text, description: Text): async Bool {
-    if (Option.isNull(campaigns.get(id))) return false;
-    let verified = Text.startsWith(url, #text "https://");
-    let proof: Proof = {
-      url; description; timestamp = Time.now(); verified
-    };
-
-    let updated = switch (proofs.get(id)) {
-      case null { [proof] };
-      case (?list) { Array.append(list, [proof]) };
-    };
-    proofs.put(id, updated);
-
-    switch (campaigns.get(id)) {
-      case (?camp) campaigns.put(id, { camp with status = #pending_release });
-      case null {}
-    };
-    updateCertifiedData();
-    return true;
   };
 
   // Allow user to stake ICP to become an auditor
@@ -334,10 +391,6 @@ actor class VeriFund() = this {
     });
   };
 
-  public query func getProofs(id: Text): async [Proof] {
-    Option.get(proofs.get(id), []);
-  };
-
   public query func getAuditor(id: Text): async ?Principal {
     auditors.get(id);
   };
@@ -348,100 +401,6 @@ actor class VeriFund() = this {
 
   public query (message) func whoami() : async Principal {
     message.caller;
-  };
-
-  //File Vault
-    // Return files associated with a user's principal.
-  private func getUserFiles(user : Principal) : UserFiles {
-    switch (HashMapMap.get(files, phash, user)) {
-      case null {
-        let newFileMap = HashMapMap.new<Text, File>();
-        let _ = HashMapMap.put(files, phash, user, newFileMap);
-        newFileMap;
-      };
-      case (?existingFiles) existingFiles;
-    };
-  };
-
-  // Check if a file name already exists for the user.
-  public shared (msg) func checkFileExists(name : Text) : async Bool {
-    Option.isSome(HashMapMap.get(getUserFiles(msg.caller), thash, name));
-  };
-
-  // Upload a file in chunks.
-  public shared (msg) func uploadFileChunk(name : Text, chunk : Blob, index : Nat, fileType : Text) : async () {
-    let userFiles = getUserFiles(msg.caller);
-    let fileChunk = { chunk = chunk; index = index };
-
-    switch (HashMapMap.get(userFiles, thash, name)) {
-      case null {
-        let _ = HashMapMap.put(userFiles, thash, name, { name = name; chunks = [fileChunk]; totalSize = chunk.size(); fileType = fileType });
-      };
-      case (?existingFile) {
-        let updatedChunks = Array.append(existingFile.chunks, [fileChunk]);
-        let _ = HashMapMap.put(
-          userFiles,
-          thash,
-          name,
-          {
-            name = name;
-            chunks = updatedChunks;
-            totalSize = existingFile.totalSize + chunk.size();
-            fileType = fileType;
-          }
-        );
-      };
-    };
-  };
-
-  // Return list of files for a user.
-  public shared (msg) func getFiles() : async [{ name : Text; size : Nat; fileType : Text }] {
-    Iter.toArray(
-      Iter.map(
-        HashMapMap.vals(getUserFiles(msg.caller)),
-        func(file : File) : { name : Text; size : Nat; fileType : Text } {
-          {
-            name = file.name;
-            size = file.totalSize;
-            fileType = file.fileType;
-          };
-        }
-      )
-    );
-  };
-
-  // Return total chunks for a file
-  public shared (msg) func getTotalChunks(name : Text) : async Nat {
-    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
-      case null 0;
-      case (?file) file.chunks.size();
-    };
-  };
-
-  // Return specific chunk for a file.
-  public shared (msg) func getFileChunk(name : Text, index : Nat) : async ?Blob {
-    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
-      case null null;
-      case (?file) {
-        switch (Array.find(file.chunks, func(chunk : FileChunk) : Bool { chunk.index == index })) {
-          case null null;
-          case (?foundChunk) ?foundChunk.chunk;
-        };
-      };
-    };
-  };
-
-  // Get file's type.
-  public shared (msg) func getFileType(name : Text) : async ?Text {
-    switch (HashMapMap.get(getUserFiles(msg.caller), thash, name)) {
-      case null null;
-      case (?file) ?file.fileType;
-    };
-  };
-
-  // Delete a file.
-  public shared (msg) func deleteFile(name : Text) : async Bool {
-    Option.isSome(HashMapMap.remove(getUserFiles(msg.caller), thash, name));
   };
 };
 
