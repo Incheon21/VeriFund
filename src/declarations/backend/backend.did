@@ -4,8 +4,10 @@ type VeriFund =
    donate: (text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
    getCampaigns: () -> (vec Campaign) query;
+   getCampaignsByUser: (principal) -> (vec Campaign) query;
    getCertifiedData: () -> (blob) query;
-   getDonations: (text) -> (vec Donation) query;
+   getDonationsByID: (text) -> (vec Donation) query;
+   getDonationsByUser: (principal) -> (vec Donation) query;
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
    getProofs: (text) -> (vec Proof) query;

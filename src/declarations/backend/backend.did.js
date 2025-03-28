@@ -34,8 +34,18 @@ export const idlFactory = ({ IDL }) => {
     'donate' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Bool], []),
     'getAuditor' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Principal)], ['query']),
     'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
+    'getCampaignsByUser' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(Campaign)],
+        ['query'],
+      ),
     'getCertifiedData' : IDL.Func([], [IDL.Vec(IDL.Nat8)], ['query']),
-    'getDonations' : IDL.Func([IDL.Text], [IDL.Vec(Donation)], ['query']),
+    'getDonationsByID' : IDL.Func([IDL.Text], [IDL.Vec(Donation)], ['query']),
+    'getDonationsByUser' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Vec(Donation)],
+        ['query'],
+      ),
     'getMyPendingCampaigns' : IDL.Func(
         [IDL.Principal],
         [IDL.Vec(IDL.Text)],

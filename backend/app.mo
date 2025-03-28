@@ -234,8 +234,34 @@ actor class VeriFund() = this {
     Iter.toArray(campaigns.vals());
   };
 
-  public query func getDonations(id: Text): async [Donation] {
+  public query func getCampaignsByUser(user: Principal): async [Campaign] {
+    let filtered = Iter.filter<(Text, Campaign)>(
+      campaigns.entries(),
+      func((id: Text, camp: Campaign)) : Bool {
+        camp.owner == user
+      }
+    );
+
+    let mapped = Iter.map<(Text, Campaign), Campaign>(
+      filtered,
+      func((id: Text, camp: Campaign)) : Campaign {
+        camp
+      }
+    );
+
+    Iter.toArray(mapped);
+  };
+
+  public query func getDonationsByID(id: Text): async [Donation] {
     Option.get(donations.get(id), []);
+  };
+
+  public query func getDonationsByUser(user: Principal): async [Donation] {
+    let allDonations : [Donation] = Array.flatten(Iter.toArray(donations.vals()));
+
+    Array.filter<Donation>(allDonations, func(d: Donation) : Bool {
+      d.donor == user
+    });
   };
 
   public query func getProofs(id: Text): async [Proof] {

@@ -15,14 +15,14 @@ const Navbar = () => {
       <h1 className="text-xl font-bold">VeriFund</h1>
       <div className="gap-4 relative flex flex-row items-center justify-center">
         <div className="gap-4 flex flex-row items-center justify-center">
-          <p>Home</p>
-          <p>About</p>
-          <p>Explore</p>
+          <NavLink to="/" className="hover:underline">Home</NavLink>
+          <NavLink to="" className="hover:underline">About</NavLink>
+          <NavLink to="/explore" className="hover:underline">Explore</NavLink>
         </div>
         {isAuthenticated ? (
           <div clas>
             <button
-              className="bg-black rounded-full text-white hover:bg-[#242424] font-bold p-2"
+              className={` ${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-2`}
               onClick={toggleDropdown}
             >
               <img src="/profile.png" className="w-8 h-8 rounded-full" />
