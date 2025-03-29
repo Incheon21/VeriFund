@@ -1,8 +1,8 @@
-# VeriFund
-
-< Insert Front Page Image Here >
-
-<div align="center"> <h1> Secure your kindness with Verifund! </h1> </div> <br>
+<div align="center"> 
+  <h1> VeriFund </h1>
+  <h3> Secure your kindness with Verifund! </h3>
+  < Insert Front Page Image Here >
+</div> <br>
 
 <div align="center"> 
 
@@ -19,6 +19,24 @@
 **VeriFund** is a decentralized, trustless platform built to revolutionize how people give. Powered by the Internet Computer, VeriFund allows anyone to create or contribute to donation campaigns with transparency, verifiability, and global accessibility.
 
 Every donation is stored on-chain, publicly auditable, and protected by smart contract rules — ensuring that funds are not only received, but responsibly used. With a unique **proof-of-donation** and **proof-of-usage** model, VeriFund builds a culture of accountability without compromise.
+
+##  Table of Contents
+
+- [Why?](#why)
+- [Solution & Opportunity: VeriFund](#solution--opportunity-verifund)
+  - [VeriFund introduces a new donation paradigm where:](#verifund-introduces-a-new-donation-paradigm-where)
+  - [Opportunity](#opportunity)
+- [VeriFund's Vision and Mission](#verifunds-vision-and-mission)
+  - [Vision](#vision)
+  - [Mission](#mission)
+- [Tech Stack](#tech-stack)
+- [Core Features](#core-features)
+  -  [System Flow](#system-flow)
+- [Roles in System](#roles-in-system)
+- [How to Build](#how-to-build)
+- [Future Development Plans](#future-development-plans)
+- [License](#license)
+
 
 
 ## Why?
@@ -49,26 +67,25 @@ VeriFund is not just a donation platform — it's an ecosystem of accountability
 
 | ICP Capability         | Why It Matters for VeriFund                                                                                   |
 |------------------------|---------------------------------------------------------------------------------------------------------------|
-| On-chain compute   | VeriFund logic (timers, randomness, staking, auditing) runs fully on-chain, not just payment transactions.   |
+| On-chain compute   | VeriFund logic (timers, staking, auditing) runs fully on-chain, not just payment transactions.   |
 | On-chain storage   | All campaign data, donations, and usage reports are stored and served directly from the chain — no centralized servers. |
 | HTTPS Outcalls   | VeriFund can fetch and verify live data (e.g., price feeds, file links, external APIs) directly from the canister. |
 | Certified Queries  | Donors see cryptographically certified frontend data, ensuring frontend integrity.                          |
-| Internet Identity  | Users can login without passwords, securely and privately across devices.                                  |
-| Autonomous Timers  | VeriFund can remind fundraisers daily, or trigger automated audits — all on-chain.                         |
+| Internet Identity  | Users can login without passwords, securely and privately across devices.                                  |                        |
 | Near-zero gas fees | Enables microdonations, global access, and predictable costs.                                               |
 
 This makes ICP the only chain where a system like VeriFund could emerge without depending on bridges, oracles, or Web2 services.
 
-### 🔗 VeriFund introduces a new donation paradigm where:
+#### VeriFund introduces a new donation paradigm where:
 
 * **Every donation is public, verifiable, and tamper-proof**: Donors can check exactly when and how much was donated, down to the wallet.
-* **Proof-of-usage is required and audited**: Fundraisers must submit links or files (in future: FileVault), and these are reviewed by randomly selected public auditors.
+* **Proof-of-usage is required and audited**: Fundraisers must submit links or files (in future: FileVault), and these are reviewed by public auditors.
 * **Auditors stake ICP to participate**: They have skin in the game: honest actors are rewarded; inactive ones are penalized.
 * **All data is on-chain and certifiable**: Even the frontend views shown to users are backed by certified data, making fake interfaces impossible.
 * **Global, borderless donations are enabled**: Donors use ICP, a crypto-native, low-fee token — no banks, no PayPal, no restrictions.
 * **VeriFund is fully decentralized**: No central authority controls funds. All logic is transparent, auditable, and upgradeable.
 
-### 🌍 Opportunity 
+#### Opportunity 
 
 * Small grassroots campaigns in underserved regions can raise funds internationally.
 * Disaster relief efforts can be tracked and verified by the public.
@@ -77,11 +94,11 @@ This makes ICP the only chain where a system like VeriFund could emerge without 
 
 ## VeriFund's Vision and Mission
 
-### Vision
+#### Vision
 
 To create a global standard for transparent, trustless, and verifiable charitable giving using decentralized technologies.
 
-### Mission
+#### Mission
 
 1. Make donations verifiable
 2. Break down global donation barriers
@@ -97,43 +114,76 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 | Identity     | **Internet Identity** (passwordless decentralized auth)                       |
 | Storage      | **Certified Data**, on-chain HashMap, stable memory, file vault                         |
 | Communication| **HTTPS Outcalls** to fetch live price/proofs                                |
-| Logic        | **Timers**, randomness (for auditor selection)                                |
+| Logic        | **Timers**                             |
 | Frontend     | **React + Vite** deployed as an ICP asset canister                            |
 | Platform     | **Internet Computer Protocol (ICP)**                                          |
 
 
 ## Core Features
 
-| Feature                          | Description                                                                                      |
-|----------------------------------|--------------------------------------------------------------------------------------------------|
-| Transparent Donation Logs | All donation history is stored on-chain and publicly accessible.                            |
-| Certified Frontend Access | Ensures users are reading verified, non-fake data using **certified variables                |
-| Proof-of-Usage Upload     | Fundraisers upload external links or files as proof of how funds were used.                    |
-| Public Auditors             | Each campaign randomly selects an auditor to review and approve usage reports.                 |
-| Staking + Reward Mechanism| Auditors stake ICP to be eligible. Honest auditors get rewards, lazy ones get penalized.       |
-| Reminder System (Timers)  | Daily on-chain reminders encourage fundraisers to submit proof.                                |
-| Live ICP/USD Conversion   | Uses HTTPS outcalls to Coinbase API for accurate pricing.                                  |
-| Global, Borderless Platform | Open to everyone worldwide — no banks, no borders, just trustless giving.                     |
+#### 🔎 Transparent Donation Logs
+All donations made to a campaign are recorded on-chain — viewable by anyone, tamper-proof, and timestamped.  
+This allows donors, auditors, and even the public to verify donation flows at any time without needing permission.
 
-### Donation & Proof Flow
+>Example:  
+`Donor A → Campaign B → 20 ICP → 2025-03-25 12:03 UTC`
+
+---
+
+
+
+#### 🧾 **Certified Frontend Access**  
+Every interface users interact with is backed by **certified variables** from the Internet Computer.  
+This ensures data displayed (e.g., campaign balance, proof status) hasn’t been manipulated by malicious frontends.
+
+> Why it matters: Prevents phishing, fake fundraisers, and UI spoofing.
+
+---
+
+#### 📁 **Proof-of-Usage Uploads**  
+Fundraisers must upload usage reports (receipts, invoices, photos, links).  
+These are stored on-chain (or verified via link) and become public proof of accountability.
+
+> Important mechanism to prevent malicious usage of fund
+
+---
+
+#### 🔍 **Public Auditors**  
+Users can participate as auditors by staking ICPs.  
+They review submitted proofs and vote to approve or reject.  
+Their votes are also recorded on-chain for transparency.
+
+> Adds a layer of social trust without central authority.
+
+--- 
+
+#### 💰 **Staking + Reward Mechanism**  
+Auditors stake ICP to prevent spam or lazy participation.  
+If they vote diligently and align with majority, they get rewarded.  
+If they fail to act or vote fraudulently, their stake is slashed.
+
+> Makes honesty economically incentivized.
+
+
+      
+
+#### System Flow
 
 ![VeriFund Logic](./assets/VeriFund_Logic.png)
 
 ## Roles in System
 
-### 👤 1. Donor
+#### 👤 1. Donor
 * Can donate ICP to any campaign.
 * Donations are stored transparently and shown publicly.
 * Can check reports & auditor logs.
 
-### 🧑‍💼 2. Fundraiser
+#### 🧑‍💼 2. Fundraiser
 * Can create campaigns with target and description.
 * Must submit proof of fund usage (e.g., links, invoices).
-* Will be reminded via timers if no report is submitted.
 
-### 🕵️ 3. Auditor
+#### 🕵️ 3. Auditor
 * Must stake ICP to be eligible.
-* Randomly selected monthly per campaign.
 * Must approve/reject proofs submitted by fundraisers.
 * Rewarded if diligent. Slashed if negligent.
 
@@ -221,3 +271,25 @@ dfx deploy
 
 
 ## License 
+
+MIT License
+
+Copyright (c) 2025 Cisli
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
