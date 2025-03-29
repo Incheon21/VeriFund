@@ -48,6 +48,9 @@ const Navbar = () => {
           <NavLink to="/explore" className="hover:underline">
             Explore
           </NavLink>
+          <NavLink to="/auditors" className="hover:underline">
+            Auditors
+          </NavLink>
         </div>
         {isAuthenticated ? (
           <div clas>

@@ -219,40 +219,58 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
 
   // Donate ICP (mocked) to a specific campaign
   public func donate(donor:Principal, id: Text, amount: Nat): async Bool {
-    switch (campaigns.get(id)) {
-      case null return false;
-      case (?camp) {
-        if (camp.status != #active) return false;
-        campaigns.put(id, { camp with collected = camp.collected + amount });
+  switch (campaigns.get(id)) {
+    case null return false;
+    case (?camp) {
+      if (camp.status != #active) return false;
+      
+      // Calculate the new collected amount
+      let newCollected = camp.collected + amount;
+      
+      // Determine if we should change status to pending_release
+      let newStatus = if (newCollected >= camp.target) #pending_release else camp.status;
+      
+      // Update the campaign with new collected amount and possibly new status
+      campaigns.put(id, { 
+        camp with 
+        collected = newCollected;
+        status = newStatus;
+      });
 
-        let donation: Donation = {
-          donor;
-          amount;
-          timestamp = Time.now();
-        };
-
-        let updated = switch (donations.get(id)) {
-          case null { [donation] };
-          case (?list) { Array.append(list, [donation]) };
-        };
-        donations.put(id, updated);
-        updateCertifiedData();
-        return true;
+      let donation: Donation = {
+        donor;
+        amount;
+        timestamp = Time.now();
       };
+
+      let updated = switch (donations.get(id)) {
+        case null { [donation] };
+        case (?list) { Array.append(list, [donation]) };
+      };
+      donations.put(id, updated);
+      updateCertifiedData();
+      
+      // If status changed to pending_release, let's try to pick an auditor
+      if (newStatus == #pending_release) {
+        ignore pickAuditor(id);
+      };
+      
+      return true;
     };
   };
+};
 
   // Allow user to stake ICP to become an auditor
-  public shared(msg) func stakeAsAuditor(amount: Nat): async Bool {
-    let prev = Option.get(stakes.get(msg.caller), 0);
-    stakes.put(msg.caller, prev + amount);
+  public func stakeAsAuditor(who: Principal,amount: Nat): async Bool {
+    let prev = Option.get(stakes.get(who), 0);
+    stakes.put(who, prev + amount);
     return true;
   };
 
   // Auditor decision to release or reject fund release
-  public shared(msg) func releaseDecision(id: Text, approve: Bool): async Bool {
+  public func releaseDecision(who: Principal, id: Text, approve: Bool): async Bool {
     switch (auditors.get(id)) {
-      case (?aud) if (aud != msg.caller) return false;
+      case (?aud) if (aud != who) return false;
       case _ {};
     };
     switch (campaigns.get(id)) {
@@ -355,6 +373,54 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
 
     Iter.toArray<Text>(mapped);
   };
+
+  public func requestFundRelease(who: Principal, id: Text): async Bool {
+  switch (campaigns.get(id)) {
+    case (?camp) {
+      if (camp.owner != who or camp.status != #active) return false;
+      campaigns.put(id, { camp with status = #pending_release });
+      updateCertifiedData();
+      return true;
+    };
+    case null return false;
+  };
+};
+
+// Get campaigns pending for review by auditors
+public query func getPendingReviewCampaigns(): async [Campaign] {
+  let filtered = Iter.filter<(Text, Campaign)>(
+    campaigns.entries(),
+    func((id: Text, camp: Campaign)) : Bool {
+      camp.status == #pending_release
+    }
+  );
+
+  let mapped = Iter.map<(Text, Campaign), Campaign>(
+    filtered,
+    func((id: Text, camp: Campaign)) : Campaign { camp }
+  );
+
+  Iter.toArray<Campaign>(mapped);
+};
+
+// Check if user can be an auditor for a specific campaign
+public query func canReviewCampaign(reviewer: Principal, campaignId: Text): async Bool {
+  switch (campaigns.get(campaignId)) {
+    case (?campaign) {
+      // User cannot review their own campaign
+      if (campaign.owner == reviewer) {
+        return false;
+      };
+      // User must have staked something
+      let userStake = Option.get(stakes.get(reviewer), 0);
+      return userStake > 0;
+    };
+    case null {
+      return false;
+    };
+  };
+};
+
 
   // Queries
   public query func getCampaigns(): async [Campaign] {
