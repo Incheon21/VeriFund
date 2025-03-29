@@ -44,8 +44,10 @@ export default function Auditors() {
       
       // Filter out campaigns the user owns
       const filteredCampaigns = pendingCampaigns.filter(
-        campaign => Principal.toString(campaign.owner) !== principal
+        campaign => campaign.owner.toText() !== principal
       );
+
+      console.log("Filtered campaigns:", filteredCampaigns);
       
       setCampaigns(filteredCampaigns);
     } catch (error) {
