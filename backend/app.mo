@@ -454,4 +454,3 @@ public query func canReviewCampaign(reviewer: Principal, campaignId: Text): asyn
       }
   }
 };
-

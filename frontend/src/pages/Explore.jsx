@@ -27,9 +27,11 @@ export default function Explore({ setRoute }) {
 
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
+  const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
 
   return (
     <div className="w-full min-h-screen mt-12 text-gray-900">
+      {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Explore Campaigns</h1>
