@@ -440,7 +440,7 @@ public query func canReviewCampaign(reviewer: Principal, campaignId: Text): asyn
     return releasedCampaigns;
   };
 
-  public query func collectFund(campaignId: Text, user: Principal) : async Bool {
+  public func collectFund(campaignId: Text, user: Principal) : async Bool {
       switch (campaigns.get(campaignId)) {
           case (?c) {
               if (c.owner == user and c.status == #released) {
