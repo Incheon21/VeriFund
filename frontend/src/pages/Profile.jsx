@@ -203,7 +203,7 @@ export default function Profile() {
   }, [principal]);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 mt-6">
+    <div className="min-h-screen text-gray-900 mt-6">
       <main className="container mx-auto px-6 py-8">
         {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 

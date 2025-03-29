@@ -69,7 +69,7 @@ export default function Explore() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900">
+    <div className="w-full min-h-screen mt-12 text-gray-900">
       {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Explore Campaigns</h1>
@@ -85,6 +85,9 @@ export default function Explore() {
                   <li
                     key={index}
                     className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 transition transform hover:-translate-y-1 hover:shadow-2xl">
+                    <div>
+                      <img src="/donation.jpg" alt={camp.title} className="w-full h-48 object-cover rounded-lg mb-4" />
+                    </div>
                     <h2 className="text-2xl font-bold mb-2">{camp.title}</h2>
                     <p className="text-gray-700 mb-4">{camp.description}</p>
                     <div className="mb-2">

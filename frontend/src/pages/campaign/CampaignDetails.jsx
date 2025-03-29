@@ -43,9 +43,12 @@ export default function CampaignDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 w-full px-6 py-8">
+    <div className=" text-gray-900 w-full px-6 py-8">
       {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <div>
+          <img src="/donation.jpg" alt={campaign.title} className="w-full h-64 object-cover rounded-lg mb-4" />
+        </div>
         <h1 className="text-3xl font-bold mb-4">{campaign.title}</h1>
         <p className="text-gray-700 mb-6">{campaign.description}</p>
         <div className="mb-4 space-y-2">
