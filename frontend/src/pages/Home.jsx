@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useAuth } from "../utils/auth.jsx";
 
 const Button = ({ onClick, children, className }) => (
-  <button onClick={onClick} className={`bg-[#12A3ED] hover:bg-[#1292ed] text-white font-bold py-2 px-4 rounded-lg ${className}`}>
+  <button
+    onClick={onClick}
+    className={`bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-300 ${className}`}>
     {children}
   </button>
 );
@@ -11,46 +13,36 @@ const Home = () => {
   const { isAuthenticated, principal, whoami } = useAuth();
 
   return (
-    <div className="w-full max-w-full flex h-full flex-col items-center">
-      <section className="w-full h-[650px] max-h-[650px] flex justify-center relative">
-        <div className="w-full h-full absolute top-0 left-0">
-          <div className="w-full h-full relative">
-            <img src="/home.png" alt="CisliNinja Platform Banner" className="w-full h-full object-cover" />
-            <div className="bg-gradient-to-t from-black to-black/0 via-black/60 absolute top-0 left-0 w-full h-full" />
-          </div>
-        </div>
-        <div className="relative w-full h-full max-w-[1000px] mx-auto flex flex-col items-end justify-end gap-2 py-10 px-4">
-          <h1 className="text-6xl font-bold tracking-widest relative">VeriFund</h1>
-          <p className="">Empower Your Event, Amplify Your Cause</p>
+    <div className="w-full">
+      <section className="w-full bg-gradient-to-r from-stone-200 to-stone-300 flex flex-col items-center py-16 text-center text-gray-800">
+        <h1 className="text-5xl font-extrabold tracking-wide mb-6 drop-shadow-sm">VeriFund</h1>
+        <p className="text-2xl font-light max-w-3xl mb-8 drop-shadow-sm">Empower Your Event, Amplify Your Cause</p>
+        <div className="flex gap-6">
+          <Button onClick={whoami}>Whoami</Button>
         </div>
       </section>
-      <section className="w-full flex justify-center min-h-fit py-10 bg-[#080808]">
-        <div className="flex max-w-[1000px] mx-auto flex-col">
-          <h2 className="text-2xl font-bold mb-4">Who Are You?</h2>
-          <div className="p-4 mb-4 rounded-md">
-            <div>
-              <p className="mb-2">
-                <i className="fas fa-info-circle"></i> A <strong>principal</strong> is a unique identifier in the Internet
-                Computer ecosystem.
-              </p>
-              <p className="mb-2">
-                It represents an entity (user, canister smart contract, or other) and is used for identification and authorization
-                purposes.
-              </p>
-              <p className="mb-2">
-                In this example, click "Whoami" to find out the principal ID with which you're interacting with the backend. If
-                you're not signed in, you will see that you're using the so-called anonymous principal, "2vxsx-fae".
-              </p>
-              <p className="mb-2">
-                After you've logged in with Internet Identity, you'll see a longer principal, which is unique to your identity and
-                the dapp you're using.
-              </p>
-            </div>
+
+      <section className="w-full bg-amber-100 py-12">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-4xl font-bold text-gray-800 mb-6">Who Are You?</h2>
+          <div className="bg-white p-6 rounded-md shadow-md">
+            <p className="text-lg text-gray-700 mb-4">
+              A <strong>principal</strong> is a unique identifier in the Internet Computer ecosystem. It represents an entity
+              (user, canister smart contract, or other) used for identification and authorization.
+            </p>
+            <p className="text-lg text-gray-700 mb-4">
+              Click "Whoami" to discover your principal ID. If you are not signed in, you'll see the anonymous principal,{" "}
+              <span className="font-mono">2vxsx-fae</span>.
+            </p>
+            <p className="text-lg text-gray-700">
+              After signing in with Internet Identity, you'll see a longer, unique principal ID specific to your identity and this
+              dApp.
+            </p>
           </div>
           {principal && (
-            <div className="mt-4">
-              <h3 className="text-xl font-bold">Your principal ID is:</h3>
-              <p className="text-lg p-2 mt-2 rounded break-all">{principal}</p>
+            <div className="mt-6">
+              <h3 className="text-2xl font-bold text-gray-800">Your Principal ID</h3>
+              <p className="text-xl bg-gray-50 p-4 mt-2 rounded-md break-all text-gray-600">{principal}</p>
             </div>
           )}
           <div className="mt-6">
@@ -60,24 +52,24 @@ const Home = () => {
         </div>
       </section>
 
-      <section id="about-section" className="flex justify-center w-full py-10 bg-[#080808]">
-        <div className="about-section  py-20 w-full max-w-[1000px] flex flex-col items-center gap-10 px-6">
-          <h2 className="text-4xl font-bold">About VeriFund</h2>
+      <section id="about-section" className="flex justify-center w-full bg-gray-100 py-20">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col items-center gap-10">
+          <h2 className="text-4xl font-bold text-gray-800 text-center">About VeriFund</h2>
           <div className="w-full flex flex-col">
-            <p>
+            <p className="text-lg text-gray-700 leading-relaxed">
               <span className="font-bold">VeriFund</span> is a decentralized, trustless platform built to revolutionize how people
               give. Powered by the Internet Computer, VeriFund allows anyone to create or contribute to donation campaigns with
               transparency, verifiability, and global accessibility.
             </p>
-            <p>
+            <p className="text-lg text-gray-700 mt-4 leading-relaxed">
               Every donation is stored on-chain, publicly auditable, and protected by smart contract rules — ensuring that funds
-              are not only received, but responsibly used. With a unique proof-of-donation and proof-of-usage model, VeriFund
-              builds a culture of accountability without compromise.
+              are responsibly used. With a unique proof-of-donation and proof-of-usage model, VeriFund builds a culture of
+              accountability without compromise.
             </p>
           </div>
           <div className="w-full flex flex-col">
-            <h3 className="text-2xl">Vision</h3>
-            <p>
+            <h3 className="text-2xl font-bold text-gray-800">Vision</h3>
+            <p className="text-lg text-gray-700 mt-2">
               To create a borderless, trustless, and transparent giving ecosystem where every donation is secure, verifiable, and
               meaningful.
             </p>

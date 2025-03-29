@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { createActor } from "declarations/backend";
+import { canisterId } from "declarations/backend/index.js";
 import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 import Alert from "../components/Alert";
@@ -118,7 +120,6 @@ export default function Auditors() {
         type: "success",
         message: `File ${campaign.file.name} downloaded successfully!`,
         message: `File ${campaign.file.name} downloaded successfully!`,
-        message: `File ${campaign.file.name} downloaded successfully!`,
       });
     } catch (error) {
       console.error("File download error:", error);
@@ -142,9 +143,6 @@ export default function Auditors() {
       if (result) {
         setAlert({
           type: "success",
-          message: approve
-            ? "Campaign approved successfully! Funds are released."
-            : "Campaign rejected. Campaign returned to active status.",
           message: approve
             ? "Campaign approved successfully! Funds are released."
             : "Campaign rejected. Campaign returned to active status.",
