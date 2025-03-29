@@ -216,7 +216,7 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
   switch (campaigns.get(id)) {
     case null return false;
     case (?camp) {
-      if (camp.status != #active) return false;
+      if (camp.status == #released or camp.status == #collected) return false;
       
       let newCollected = camp.collected + amount;
       

@@ -31,8 +31,8 @@ const Home = () => {
       particles.push({
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        speedX: (Math.random() - 0.5) * 1.5,
-        speedY: (Math.random() - 0.5) * 1.5,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5,
         size: Math.random() * 2 + 1,
         uniqueId: i,
       });
@@ -151,10 +151,14 @@ const Home = () => {
               "Proof-of-Usage, Not Just Promises",
               "Decentralized, Borderless, Built on ICP",
             ].map((point, index) => (
-              <div key={index} className="flex flex-col items-center justify-center">
+              <div
+                key={index}
+                className="flex flex-col items-center justify-center"
+              >
                 <h3 className="text-2xl font-semibold">{point}</h3>
                 {index < 2 && (
-                  <div className="hidden md:block absolute h-24 w-px bg-white"
+                  <div
+                    className="hidden md:block absolute h-24 w-px bg-white"
                     style={{
                       right: `calc(${(100 / 3) * (index + 1)}% - 0.5px)`,
                       top: "50%",
