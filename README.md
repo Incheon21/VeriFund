@@ -20,14 +20,19 @@
 
 Every donation is stored on-chain, publicly auditable, and protected by smart contract rules — ensuring that funds are not only received, but responsibly used. With a unique **proof-of-donation** and **proof-of-usage** model, VeriFund builds a culture of accountability without compromise.
 
-## Table of Contents
-- [Introduction](#introduction)
+## 📚 Table of Contents
+- [Why?](#why)
 - [Solution & Opportunity: VeriFund](#solution--opportunity-verifund)
-- [Architecture](#architecture)
-- [Flowchart](#flowchart)
+- [VeriFund's Vision and Mission](#verifunds-vision-and-mission)
+- [Tech Stack](#tech-stack)
+- [Core Features](#core-features)
+- [Roles in System](#roles-in-system)
+- [How to Build](#how-to-build)
+- [Future Development Plans](#future-development-plans)
+- [License](#license)
 
 
-## Why?
+## ❓ Why?
 
 Charity and donation systems across the world face a persistent and growing crisis: a lack of transparency, traceability, and trust. According to the **Charities Aid Foundation (CAF World Giving Index 2023)**:
 
@@ -49,7 +54,7 @@ At the same time, blockchain has matured to enable:
 
 VeriFund emerges to solve this pressing global need for trustless, proof-based, on-chain donation systems, enabling borderless giving with verifiable usage.
 
-## Solution & Opportunity: VeriFund 
+## 💡Solution & Opportunity: VeriFund 
 
 VeriFund is not just a donation platform — it's an ecosystem of accountability, built on a blockchain that can actually support it i.e. the Internet Computer Protocol (ICP) that isn’t just another smart contract chain. It's the only blockchain that allows developers to build full-stack decentralized applications, including:
 
@@ -65,7 +70,7 @@ VeriFund is not just a donation platform — it's an ecosystem of accountability
 
 This makes ICP the only chain where a system like VeriFund could emerge without depending on bridges, oracles, or Web2 services.
 
-### 🔗 VeriFund introduces a new donation paradigm where:
+#### 🔗 VeriFund introduces a new donation paradigm where:
 
 * **Every donation is public, verifiable, and tamper-proof**: Donors can check exactly when and how much was donated, down to the wallet.
 * **Proof-of-usage is required and audited**: Fundraisers must submit links or files (in future: FileVault), and these are reviewed by randomly selected public auditors.
@@ -74,20 +79,20 @@ This makes ICP the only chain where a system like VeriFund could emerge without 
 * **Global, borderless donations are enabled**: Donors use ICP, a crypto-native, low-fee token — no banks, no PayPal, no restrictions.
 * **VeriFund is fully decentralized**: No central authority controls funds. All logic is transparent, auditable, and upgradeable.
 
-### 🌍 Opportunity 
+#### 🌍 Opportunity 
 
 * Small grassroots campaigns in underserved regions can raise funds internationally.
 * Disaster relief efforts can be tracked and verified by the public.
 * NGOs and aid groups can prove transparency without costly reporting overhead.
 * Auditors become incentivized third parties, not internal staff.
 
-## VeriFund's Vision and Mission
+## 🎯VeriFund's Vision and Mission
 
-### Vision
+#### Vision
 
 To create a global standard for transparent, trustless, and verifiable charitable giving using decentralized technologies.
 
-### Vision
+#### Mission
 
 1. Make donations verifiable
 2. Break down global donation barriers
@@ -95,7 +100,7 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 4. Reward responsible fundraisers and auditors
 
 
-## Tech Stack
+## 🛠️Tech Stack
 
 | Layer        | Technology                                                                       |
 |--------------|----------------------------------------------------------------------------------|
@@ -108,7 +113,7 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 | Platform     | **Internet Computer Protocol (ICP)**                                          |
 
 
-## Core Features
+## ✨Core Features
 
 | Feature                          | Description                                                                                      |
 |----------------------------------|--------------------------------------------------------------------------------------------------|
@@ -119,32 +124,32 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 | Staking + Reward Mechanism| Auditors stake ICP to be eligible. Honest auditors get rewards, lazy ones get penalized.       |
 | Reminder System (Timers)  | Daily on-chain reminders encourage fundraisers to submit proof.                                |
 | Live ICP/USD Conversion   | Uses HTTPS outcalls to Coinbase API for accurate pricing.                                  |
-| Global, Borderless Platform | Open to everyone worldwide — no banks, no borders, just trustless giving.                    
+| Global, Borderless Platform | Open to everyone worldwide — no banks, no borders, just trustless giving.               |              
 
-### Donation & Proof Flow
+#### Donation & Proof Flow
 
 ![VeriFund Logic](./assets/VeriFund_Logic.png)
 
-## Roles in System
+## 🧑‍🤝‍🧑Roles in System
 
-### 👤 1. Donor
+#### 👤 1. Donor
 * Can donate ICP to any campaign.
 * Donations are stored transparently and shown publicly.
 * Can check reports & auditor logs.
 
-### 🧑‍💼 2. Fundraiser
+#### 🧑‍💼 2. Fundraiser
 * Can create campaigns with target and description.
 * Must submit proof of fund usage (e.g., links, invoices).
 * Will be reminded via timers if no report is submitted.
 
-### 🕵️ 3. Auditor
+#### 🕵️ 3. Auditor
 * Must stake ICP to be eligible.
 * Randomly selected monthly per campaign.
 * Must approve/reject proofs submitted by fundraisers.
 * Rewarded if diligent. Slashed if negligent.
 
 
-## How to Build
+## 🏗️ How to Build
 
 ### Required Tech Stack (install first if not available)
 - DFX CLI (https://internetcomputer.org/docs/current/developer-docs/setup/install/)
@@ -213,7 +218,7 @@ npm install
 dfx deploy
  ```
 
-## Future Development Plans
+## 🔮 Future Development Plans
 
 | Planned Feature                             
 |-------------------------------------------|
@@ -226,4 +231,26 @@ dfx deploy
 | Campaign audit history & reviewer logs    | 
 
 
-## License 
+## 📄 License 
+
+MIT License
+
+Copyright (c) 2025 Cisli
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
