@@ -80,30 +80,6 @@ export default function Profile() {
     }
   };
 
-  const loadCampaigns = async () => {
-    if (principal) {
-      try {
-        const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
-        setCampaigns(campaignsData);
-      } catch (error) {
-        console.error("Error loading campaigns:", error);
-        setAlert({ type: "error", message: "Error loading campaigns." });
-      }
-    }
-  };
-
-  const loadDonations = async () => {
-    if (principal) {
-      try {
-        const donationsData = await backendActor.getDonationsByUser(Principal.fromText(principal));
-        setDonations(donationsData);
-      } catch (error) {
-        console.error("Error loading donations:", error);
-        setAlert({ type: "error", message: "Error loading donations." });
-      }
-    }
-  };
-
   async function handleCampaignFileUpload(campaignId, event) {
     const file = event.target.files[0];
     setAlert(null);
