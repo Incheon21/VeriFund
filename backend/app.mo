@@ -16,7 +16,6 @@ import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
 import IC "ic:aaaaa-aa"; 
-import { phash; thash } "mo:map/Map";
 import HashMapMap "mo:map/Map";
 
 actor class VeriFund() = this {

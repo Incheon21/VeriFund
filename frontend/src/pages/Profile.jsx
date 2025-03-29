@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 import Alert from "../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-  },
-});
+import { backendActor } from "../utils/backendActor";
+import useAsync from "../hooks/useAsync";
 
 export default function Profile() {
   const { principal } = useAuth();
@@ -22,8 +16,36 @@ export default function Profile() {
     date: "",
   });
   const [alert, setAlert] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // used to force re-fetch
+
   const [currentPageCampaigns, setCurrentPageCampaigns] = useState(1);
   const [currentPageDonations, setCurrentPageDonations] = useState(1);
+
+  const {
+    data: campaignsData,
+    loading: loadingCampaigns,
+    error: errorCampaigns,
+  } = useAsync(
+    () => (principal ? backendActor.getCampaignsByUser(Principal.fromText(principal)) : Promise.resolve([])),
+    [principal, refreshTrigger]
+  );
+
+  const {
+    data: donationsData,
+    loading: loadingDonations,
+    error: errorDonations,
+  } = useAsync(
+    () => (principal ? backendActor.getDonationsByUser(Principal.fromText(principal)) : Promise.resolve([])),
+    [principal, refreshTrigger]
+  );
+
+  useEffect(() => {
+    if (campaignsData) setCampaigns(campaignsData);
+  }, [campaignsData]);
+
+  useEffect(() => {
+    if (donationsData) setDonations(donationsData);
+  }, [donationsData]);
 
   const totalPagesCampaigns = Math.ceil(campaigns.length / 2);
   const totalPagesDonations = Math.ceil(donations.length / 2);
@@ -32,19 +54,6 @@ export default function Profile() {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handlePrevPageCampaigns = () => {
-    if (currentPageCampaigns > 1) setCurrentPageCampaigns(currentPageCampaigns - 1);
-  };
-  const handleNextPageCampaigns = () => {
-    if (currentPageCampaigns < totalPagesCampaigns) setCurrentPageCampaigns(currentPageCampaigns + 1);
-  };
-  const handlePrevPageDonations = () => {
-    if (currentPageDonations > 1) setCurrentPageDonations(currentPageDonations - 1);
-  };
-  const handleNextPageDonations = () => {
-    if (currentPageDonations < totalPagesDonations) setCurrentPageDonations(currentPageDonations + 1);
   };
 
   const createCampaign = async (e) => {
@@ -63,36 +72,11 @@ export default function Profile() {
           message: "Campaign created successfully!",
         });
         setFormData({ title: "", description: "", target: "", date: "" });
-        loadCampaigns();
-        loadDonations();
+        setRefreshTrigger((prev) => prev + 1); // trigger refresh
       }
     } catch (error) {
       console.error("Error creating campaign:", error);
       setAlert({ type: "error", message: "Error creating campaign." });
-    }
-  };
-
-  const loadCampaigns = async () => {
-    if (principal) {
-      try {
-        const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
-        setCampaigns(campaignsData);
-      } catch (error) {
-        console.error("Error loading campaigns:", error);
-        setAlert({ type: "error", message: "Error loading campaigns." });
-      }
-    }
-  };
-
-  const loadDonations = async () => {
-    if (principal) {
-      try {
-        const donationsData = await backendActor.getDonationsByUser(Principal.fromText(principal));
-        setDonations(donationsData);
-      } catch (error) {
-        console.error("Error loading donations:", error);
-        setAlert({ type: "error", message: "Error loading donations." });
-      }
     }
   };
 
@@ -108,7 +92,7 @@ export default function Profile() {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const content = new Uint8Array(e.target.result);
-      const chunkSize = 1024 * 1024; // 1 MB chunks
+      const chunkSize = 1024 * 1024;
       const totalChunks = Math.ceil(content.length / chunkSize);
 
       try {
@@ -117,20 +101,13 @@ export default function Profile() {
           const end = Math.min(start + chunkSize, content.length);
           const chunk = content.slice(start, end);
 
-          await backendActor.uploadCampaignFile(
-            Principal.fromText(principal),
-            campaignId,
-            file.name,
-            chunk,
-            BigInt(i),
-            file.type
-          );
+          await backendActor.uploadCampaignFile(Principal.fromText(principal), campaignId, file.name, chunk, BigInt(i), file.type);
         }
         setAlert({
           type: "success",
           message: `File ${file.name} uploaded successfully!`,
         });
-        loadCampaigns();
+        setRefreshTrigger((prev) => prev + 1);
       } catch (error) {
         setAlert({
           type: "error",
@@ -148,7 +125,7 @@ export default function Profile() {
         const success = await backendActor.deleteCampaignFile(Principal.fromText(principal), campaignId, fileName);
         if (success) {
           setAlert({ type: "success", message: "File deleted successfully!" });
-          loadCampaigns();
+          setRefreshTrigger((prev) => prev + 1);
         } else {
           setAlert({ type: "error", message: "Failed to delete file" });
         }
@@ -164,7 +141,6 @@ export default function Profile() {
   async function handleCampaignFileDownload(campaignId, fileName) {
     try {
       const totalChunks = Number(await backendActor.getCampaignFileTotalChunks(campaignId));
-      console.log(totalChunks);
       const fileType = await backendActor.getCampaignFileType(campaignId);
       let chunks = [];
 
@@ -196,11 +172,11 @@ export default function Profile() {
     }
   }
 
-  useEffect(() => {
-    loadCampaigns();
-    console.log(campaigns);
-    loadDonations();
-  }, [principal]);
+  const handlePrevPageCampaigns = () => currentPageCampaigns > 1 && setCurrentPageCampaigns(currentPageCampaigns - 1);
+  const handleNextPageCampaigns = () => currentPageCampaigns < totalPagesCampaigns && setCurrentPageCampaigns(currentPageCampaigns + 1);
+
+  const handlePrevPageDonations = () => currentPageDonations > 1 && setCurrentPageDonations(currentPageDonations - 1);
+  const handleNextPageDonations = () => currentPageDonations < totalPagesDonations && setCurrentPageDonations(currentPageDonations + 1);
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-900 mt-6">
@@ -208,6 +184,7 @@ export default function Profile() {
         {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
         <div className="grid md:grid-cols-2 gap-8">
+          {/* Profile & Create Campaign */}
           <section className="bg-white rounded-lg shadow-lg p-4">
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">👤 Profile</h2>
             <p className="bg-gray-100 rounded-md p-3 text-gray-600 font-mono">{principal}</p>
@@ -221,8 +198,7 @@ export default function Profile() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                  placeholder="Campaign title"
+                  className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
                   required
                 />
               </div>
@@ -232,8 +208,7 @@ export default function Profile() {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                  placeholder="Campaign description"
+                  className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
                   required
                 />
               </div>
@@ -245,8 +220,7 @@ export default function Profile() {
                     name="target"
                     value={formData.target}
                     onChange={handleInputChange}
-                    className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    placeholder="e.g., 1000"
+                    className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
                     required
                   />
                 </div>
@@ -257,20 +231,23 @@ export default function Profile() {
                     name="date"
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
                     required
                   />
                 </div>
               </div>
-              <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+              <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
                 🚀 Create Campaign
               </button>
             </form>
           </section>
 
+          {/* Campaigns & Donations */}
           <section className="space-y-8">
             <section className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">📢 My Campaigns</h2>
+              {loadingCampaigns && <p>Loading campaigns...</p>}
+              {errorCampaigns && <p className="text-red-500">{errorCampaigns}</p>}
               {campaigns.length === 0 ? (
                 <p className="text-gray-500">No campaigns available.</p>
               ) : (
@@ -293,7 +270,7 @@ export default function Profile() {
                           <strong>Owner:</strong> {camp.owner.toText()}
                         </p>
                         <p className="text-sm text-gray-500">
-                          <strong>Proof:</strong> {camp.file?.[0]?.name ? camp.file[0].name : "no proof"}
+                          <strong>Proof:</strong> {camp.file?.[0]?.name || "no proof"}
                         </p>
                         <div className="mt-4 flex items-center space-x-4">
                           <input
@@ -301,17 +278,18 @@ export default function Profile() {
                             onChange={(e) => handleCampaignFileUpload(camp.id, e)}
                             className="text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
                           />
-
                           {camp.file && (
                             <>
                               <button
                                 onClick={() => handleCampaignFileDownload(camp.id, camp.file[0].name)}
-                                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600">
+                                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
+                              >
                                 Download File
                               </button>
                               <button
                                 onClick={() => handleCampaignFileDelete(camp.id, camp.file[0].name)}
-                                className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600">
+                                className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
+                              >
                                 Delete File
                               </button>
                             </>
@@ -325,7 +303,8 @@ export default function Profile() {
                       <button
                         onClick={handlePrevPageCampaigns}
                         disabled={currentPageCampaigns === 1}
-                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                      >
                         Prev
                       </button>
                       <span>
@@ -334,7 +313,8 @@ export default function Profile() {
                       <button
                         onClick={handleNextPageCampaigns}
                         disabled={currentPageCampaigns === totalPagesCampaigns}
-                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                      >
                         Next
                       </button>
                     </div>
@@ -345,6 +325,8 @@ export default function Profile() {
 
             <section className="bg-white rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">💰 My Donations</h2>
+              {loadingDonations && <p>Loading donations...</p>}
+              {errorDonations && <p className="text-red-500">{errorDonations}</p>}
               {donations.length === 0 ? (
                 <p className="text-gray-500">No donations found for your account.</p>
               ) : (
@@ -369,7 +351,8 @@ export default function Profile() {
                       <button
                         onClick={handlePrevPageDonations}
                         disabled={currentPageDonations === 1}
-                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                      >
                         Prev
                       </button>
                       <span>
@@ -378,7 +361,8 @@ export default function Profile() {
                       <button
                         onClick={handleNextPageDonations}
                         disabled={currentPageDonations === totalPagesDonations}
-                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+                        className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                      >
                         Next
                       </button>
                     </div>

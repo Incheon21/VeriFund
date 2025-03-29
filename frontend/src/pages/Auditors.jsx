@@ -1,18 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 import Alert from "../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host:
-      process.env.DFX_NETWORK === "ic"
-        ? "https://ic0.app"
-        : "http://localhost:4943",
-  },
-});
+import { backendActor } from "../utils/backendActor";
 
 export default function Auditors() {
   const { principal } = useAuth();
@@ -24,10 +14,7 @@ export default function Auditors() {
 
   const itemsPerPage = 3;
   const totalPages = Math.ceil(campaigns.length / itemsPerPage);
-  const paginatedCampaigns = campaigns.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedCampaigns = campaigns.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const loadData = async () => {
     if (!principal) return;
@@ -41,9 +28,7 @@ export default function Auditors() {
 
       setStake(Number(userStake));
 
-      const filteredCampaigns = pendingCampaigns.filter(
-        (campaign) => campaign.owner.toText() !== principal
-      );
+      const filteredCampaigns = pendingCampaigns.filter((campaign) => campaign.owner.toText() !== principal);
       setCampaigns(filteredCampaigns);
     } catch (error) {
       console.error("Error loading data:", error);
@@ -58,19 +43,14 @@ export default function Auditors() {
     setAlert(null);
 
     try {
-      const result = await backendActor.stakeAsAuditor(
-        Principal.fromText(principal),
-        BigInt(500)
-      );
+      const result = await backendActor.stakeAsAuditor(Principal.fromText(principal), BigInt(500));
       if (result) {
         setAlert({
           type: "success",
           message: `Successfully staked ${500} tokens!`,
         });
 
-        const newStake = await backendActor.getMyStake(
-          Principal.fromText(principal)
-        );
+        const newStake = await backendActor.getMyStake(Principal.fromText(principal));
         setStake(Number(newStake));
       }
     } catch (error) {
@@ -89,17 +69,12 @@ export default function Auditors() {
     }
 
     try {
-      const totalChunks = Number(
-        await backendActor.getCampaignFileTotalChunks(campaign.id)
-      );
+      const totalChunks = Number(await backendActor.getCampaignFileTotalChunks(campaign.id));
       const fileType = await backendActor.getCampaignFileType(campaign.id);
       let chunks = [];
 
       for (let i = 0; i < totalChunks; i++) {
-        const chunkBlob = await backendActor.getCampaignFileChunk(
-          campaign.id,
-          i
-        );
+        const chunkBlob = await backendActor.getCampaignFileChunk(campaign.id, i);
         if (chunkBlob) {
           chunks.push(chunkBlob[0]);
         } else {
@@ -134,11 +109,7 @@ export default function Auditors() {
     if (!campaign) return;
 
     try {
-      const result = await backendActor.releaseDecision(
-        Principal.fromText(principal),
-        campaign.id,
-        approve
-      );
+      const result = await backendActor.releaseDecision(Principal.fromText(principal), campaign.id, approve);
 
       if (result) {
         setAlert({
@@ -164,12 +135,8 @@ export default function Auditors() {
 
   // Change page for pagination
   const changePage = (delta) => {
-    setCurrentPage((prevPage) =>
-      Math.max(1, Math.min(totalPages, prevPage + delta))
-    );
-    setCurrentPage((prevPage) =>
-      Math.max(1, Math.min(totalPages, prevPage + delta))
-    );
+    setCurrentPage((prevPage) => Math.max(1, Math.min(totalPages, prevPage + delta)));
+    setCurrentPage((prevPage) => Math.max(1, Math.min(totalPages, prevPage + delta)));
   };
 
   useEffect(() => {
@@ -179,41 +146,24 @@ export default function Auditors() {
   return (
     <div className="w-full text-gray-900 pt-6">
       <main className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          🕵️‍♂️ Auditor Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">🕵️‍♂️ Auditor Dashboard</h1>
 
-        {alert && (
-          <Alert
-            type={alert.type}
-            message={alert.message}
-            onClose={() => setAlert(null)}
-          />
-        )}
+        {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 
         <section className="bg-white rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            🔐 Your Stake
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">🔐 Your Stake</h2>
 
           <div className="mb-6">
             <p className="text-lg mb-2">
-              Current Stake:{" "}
-              <span className="font-semibold">{stake} tokens</span>
+              Current Stake: <span className="font-semibold">{stake} tokens</span>
             </p>
 
             {stake === 0 && (
-              <p className="text-gray-600 italic mb-4">
-                You need to stake tokens to become an auditor and review
-                campaigns.
-              </p>
+              <p className="text-gray-600 italic mb-4">You need to stake tokens to become an auditor and review campaigns.</p>
             )}
 
             <form onSubmit={handleStake} className="flex items-end space-x-4">
-              <button
-                type="submit"
-                className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
-              >
+              <button type="submit" className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition">
                 Stake 500 Tokens
               </button>
             </form>
@@ -222,38 +172,23 @@ export default function Auditors() {
 
         {/* Campaigns section */}
         <section className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            📋 Campaigns Pending Review
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-4">📋 Campaigns Pending Review</h2>
 
           {isLoading ? (
-            <p className="text-gray-500 text-center py-4">
-              Loading campaigns...
-            </p>
+            <p className="text-gray-500 text-center py-4">Loading campaigns...</p>
           ) : stake === 0 ? (
-            <p className="text-gray-500 italic">
-              You must stake tokens before reviewing campaigns.
-            </p>
+            <p className="text-gray-500 italic">You must stake tokens before reviewing campaigns.</p>
           ) : campaigns.length === 0 ? (
-            <p className="text-gray-500 italic">
-              No campaigns are currently pending for review.
-            </p>
+            <p className="text-gray-500 italic">No campaigns are currently pending for review.</p>
           ) : (
             <>
               <ul className="space-y-6">
                 {paginatedCampaigns.map((campaign) => (
-                  <li
-                    key={campaign.id}
-                    className="bg-gray-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-md"
-                  >
+                  <li key={campaign.id} className="bg-gray-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-md">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-semibold">
-                        {campaign.title}
-                      </h3>
+                      <h3 className="text-lg font-semibold">{campaign.title}</h3>
                       <div className="text-sm font-medium text-gray-500">
-                        {new Date(
-                          Number(campaign.date) / 1_000_000
-                        ).toLocaleDateString()}
+                        {new Date(Number(campaign.date) / 1_000_000).toLocaleDateString()}
                       </div>
                     </div>
 
@@ -261,28 +196,19 @@ export default function Auditors() {
 
                     <div className="grid md:grid-cols-2 gap-4 text-sm mb-4">
                       <div>
-                        <strong>Target Amount:</strong>{" "}
-                        {campaign.target.toString()} ICP
+                        <strong>Target Amount:</strong> {campaign.target.toString()} ICP
                       </div>
                       <div>
-                        <strong>Collected:</strong>{" "}
-                        {campaign.collected.toString()} ICP
-                        {Number(campaign.collected) >=
-                          Number(campaign.target) && (
-                          <span className="ml-2 text-green-600 font-semibold">
-                            ✓ Target reached
-                          </span>
+                        <strong>Collected:</strong> {campaign.collected.toString()} ICP
+                        {Number(campaign.collected) >= Number(campaign.target) && (
+                          <span className="ml-2 text-green-600 font-semibold">✓ Target reached</span>
                         )}
                       </div>
                       <div>
-                        <strong>Status:</strong>{" "}
-                        {Object.keys(campaign.status)[0].replace("_", " ")}
+                        <strong>Status:</strong> {Object.keys(campaign.status)[0].replace("_", " ")}
                       </div>
                       <div>
-                        <strong>Owner:</strong>{" "}
-                        <span className="font-mono text-xs">
-                          {campaign.owner.toText().substring(0, 15)}...
-                        </span>
+                        <strong>Owner:</strong> <span className="font-mono text-xs">{campaign.owner.toText().substring(0, 15)}...</span>
                       </div>
                     </div>
 

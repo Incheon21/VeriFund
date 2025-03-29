@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import { NavLink } from "react-router";
 import { Principal } from "@dfinity/principal";
 import { useAuth } from "../utils/auth";
 import Alert from "../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-  },
-});
+import { backendActor } from "../utils/backendActor";
 
 export default function Explore() {
   const [campaigns, setCampaigns] = useState([]);
   const { principal } = useAuth();
   const [alert, setAlert] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [donationAmounts, setDonationAmounts] = useState({}); 
+  const [donationAmounts, setDonationAmounts] = useState({});
 
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
@@ -84,7 +77,8 @@ export default function Explore() {
                 return (
                   <li
                     key={index}
-                    className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 transition transform hover:-translate-y-1 hover:shadow-2xl">
+                    className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 transition transform hover:-translate-y-1 hover:shadow-2xl"
+                  >
                     <h2 className="text-2xl font-bold mb-2">{camp.title}</h2>
                     <p className="text-gray-700 mb-4">{camp.description}</p>
                     <div className="mb-2">
@@ -99,7 +93,8 @@ export default function Explore() {
                             backgroundColor: isOverTarget
                               ? `rgb(0, ${Math.min(255, 100 + (Number(camp.collected) - Number(camp.target)) * 2)}, 0)`
                               : "rgb(34, 197, 94)",
-                          }}></div>
+                          }}
+                        ></div>
                       </div>
                     </div>
                     <p className="text-sm text-gray-500 ">
@@ -128,12 +123,14 @@ export default function Explore() {
                       <div className="flex justify-between">
                         <NavLink
                           to={`/campaign/${camp.id}`}
-                          className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition">
+                          className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition"
+                        >
                           View Details
                         </NavLink>
                         <button
                           onClick={() => donateToCampaign(camp.id)}
-                          className="inline-block rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 transition">
+                          className="inline-block rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 transition"
+                        >
                           Donate
                         </button>
                       </div>
@@ -147,7 +144,8 @@ export default function Explore() {
                 <button
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition">
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
+                >
                   Prev
                 </button>
                 <span className="text-lg">
@@ -156,7 +154,8 @@ export default function Explore() {
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition">
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
+                >
                   Next
                 </button>
               </div>

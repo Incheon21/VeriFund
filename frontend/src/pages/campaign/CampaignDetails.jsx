@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import Alert from "../../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-  },
-});
+import { backendActor } from "../../utils/backendActor";
 
 export default function CampaignDetails() {
   const { id } = useParams(); // Get the campaign ID from the URL
