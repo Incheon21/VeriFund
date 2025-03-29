@@ -10,7 +10,7 @@ const backendActor = createActor(canisterId, {
     host:
       process.env.DFX_NETWORK === "ic"
         ? "https://ic0.app"
-        : "http://localhost:4943",
+        : "http://127.0.0.1:8080/?canisterId=br5f7-7uaaa-aaaaa-qaaca-cai&id=bkyz2-fmaaa-aaaaa-qaaaq-cai",
   },
 });
 

@@ -11,43 +11,34 @@ type http_header =
  };
 type VeriFund = 
  service {
-   checkFileExists: (text) -> (bool);
    createCampaign: (principal, text, text, nat, Time) -> (bool);
    deleteCampaignFile: (principal, text, text) -> (bool);
-   deleteFile: (text) -> (bool);
    donate: (principal, text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
    getBalance: (Account__1) -> (Result_3);
    getCampaignAccount: (nat) -> (Account__1);
+   getCampaignFileChunk: (text, nat) -> (opt blob) query;
+   getCampaignFileTotalChunks: (text) -> (nat) query;
+   getCampaignFileType: (text) -> (opt text) query;
    getCampaigns: () -> (vec Campaign) query;
    getCampaignsByUser: (principal) -> (vec Campaign) query;
    getCanisterAccount: () -> (Account__1);
    getCertifiedData: () -> (blob) query;
    getDonationsByID: (text) -> (vec Donation) query;
    getDonationsByUser: (principal) -> (vec Donation) query;
-   getFileChunk: (text, nat) -> (opt blob);
-   getFileType: (text) -> (opt text);
-   getFiles: () -> (vec record {
-                          fileType: text;
-                          name: text;
-                          size: nat;
-                        });
    getICPUSD: () -> (text);
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
-   getTotalChunks: (text) -> (nat);
    pickAuditor: (text) -> (bool);
    recordDonation: (nat, nat) -> (Result_2);
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
-   submitProof: (text, text, text) -> (bool);
    transfer: (TransferArgs) -> (Result_1);
    transform: (record {
                  context: blob;
                  response: http_request_result;
                }) -> (http_request_result) query;
    uploadCampaignFile: (principal, text, text, blob, nat, text) -> (bool);
-   uploadFileChunk: (text, blob, nat, text) -> ();
    verifyTransaction: (BlockIndex) -> (Result);
    whoami: () -> (principal) query;
  };
@@ -77,7 +68,12 @@ type Result =
    err: text;
    ok: bool;
  };
-type Proof = 
+type FileChunk = 
+ record {
+   chunk: blob;
+   index: nat;
+ };
+type File = 
  record {
    chunks: vec FileChunk;
    fileType: text;
