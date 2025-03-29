@@ -31,7 +31,7 @@ Every donation is stored on-chain, publicly auditable, and protected by smart co
   - [Mission](#mission)
 - [Tech Stack](#tech-stack)
 - [Core Features](#core-features)
-  -  [Donation & Proof Flow](#donation--proof-flow)
+  -  [System Flow](#system-flow)
 - [Roles in System](#roles-in-system)
 - [How to Build](#how-to-build)
 - [Future Development Plans](#future-development-plans)
@@ -167,7 +167,7 @@ If they fail to act or vote fraudulently, their stake is slashed.
 
       
 
-#### Donation & Proof Flow
+#### System Flow
 
 ![VeriFund Logic](./assets/VeriFund_Logic.png)
 
