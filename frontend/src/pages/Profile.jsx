@@ -80,6 +80,30 @@ export default function Profile() {
     }
   };
 
+  const loadCampaigns = async () => {
+    if (principal) {
+      try {
+        const campaignsData = await backendActor.getCampaignsByUser(Principal.fromText(principal));
+        setCampaigns(campaignsData);
+      } catch (error) {
+        console.error("Error loading campaigns:", error);
+        setAlert({ type: "error", message: "Error loading campaigns." });
+      }
+    }
+  };
+
+  const loadDonations = async () => {
+    if (principal) {
+      try {
+        const donationsData = await backendActor.getDonationsByUser(Principal.fromText(principal));
+        setDonations(donationsData);
+      } catch (error) {
+        console.error("Error loading donations:", error);
+        setAlert({ type: "error", message: "Error loading donations." });
+      }
+    }
+  };
+
   async function handleCampaignFileUpload(campaignId, event) {
     const file = event.target.files[0];
     setAlert(null);
@@ -189,7 +213,7 @@ export default function Profile() {
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">👤 Profile</h2>
             <p className="bg-gray-100 rounded-md p-3 text-gray-600 font-mono">{principal}</p>
 
-            <h3 className="text-xl font-semibold text-gray-700 mt-6 mb-4">🎯 Create a New Campaign</h3>
+            <h3 className="text-xl font-semibold text-gray-700 mt-6 mb-4">Create a New Campaign</h3>
             <form onSubmit={createCampaign} className="space-y-4">
               <div>
                 <label className="block text-gray-600 font-medium">Title</label>
@@ -270,7 +294,7 @@ export default function Profile() {
                           <strong>Owner:</strong> {camp.owner.toText()}
                         </p>
                         <p className="text-sm text-gray-500">
-                          <strong>Proof:</strong> {camp.file?.[0]?.name || "no proof"}
+                          <strong>Proof:</strong> {camp.file?.[0]?.name ? camp.file[0].name : "no proof"}
                         </p>
                         <div className="mt-4 flex items-center space-x-4">
                           <input
@@ -340,9 +364,6 @@ export default function Profile() {
                         <p className="text-sm text-gray-600">
                           <strong>Timestamp:</strong> {new Date(Number(don.timestamp) / 1_000_000).toLocaleString()}
                         </p>
-                        <p className="text-sm text-gray-600">
-                          <strong>Donor:</strong> {don.donor.toText()}
-                        </p>
                       </li>
                     ))}
                   </ul>
@@ -353,6 +374,7 @@ export default function Profile() {
                         disabled={currentPageDonations === 1}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                       >
+                        {" "}
                         Prev
                       </button>
                       <span>
@@ -363,6 +385,7 @@ export default function Profile() {
                         disabled={currentPageDonations === totalPagesDonations}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                       >
+                        {" "}
                         Next
                       </button>
                     </div>
