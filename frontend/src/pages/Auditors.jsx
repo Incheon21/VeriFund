@@ -129,7 +129,7 @@ export default function Auditors() {
   return (
     <div className="w-full text-gray-900 pt-6">
       <main className="container mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">🕵️‍♂️ Auditor Dashboard</h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Auditor Dashboard</h1>
 
         {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
 

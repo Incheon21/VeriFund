@@ -168,7 +168,7 @@ export default function Profile() {
         <div className="grid md:grid-cols-2 gap-8">
           {/* Profile & Create Campaign */}
           <section className="bg-white rounded-lg shadow-lg p-4">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">👤 Profile</h2>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">Profile</h2>
             <p className="bg-gray-100 rounded-md p-3 text-gray-600 font-mono">{principal}</p>
 
             <h3 className="text-xl font-semibold text-gray-700 mt-6 mb-4">Create a New Campaign</h3>
