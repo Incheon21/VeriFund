@@ -54,7 +54,7 @@ const Navbar = () => {
         <div className="gap-4 flex flex-row items-center justify-center">
           <NavLink
             to="/"
-            className="hover:underline"
+            className="hover:underline cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               navigate("/");
@@ -66,7 +66,7 @@ const Navbar = () => {
           </NavLink>
           <NavLink
             to="/"
-            className="hover:underline"
+            className="hover:underline cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               navigate("/");
@@ -79,34 +79,39 @@ const Navbar = () => {
             }}>
             About
           </NavLink>
-          <NavLink to="/explore" className="hover:underline">
-            Explore
+          <NavLink to="/explore" className="hover:underline cursor-pointer">
+            Donate
           </NavLink>
-          <NavLink to="/auditors" className="hover:underline">
+          <NavLink to="/auditors" className="hover:underline cursor-pointer">
             Auditors
           </NavLink>
+          {principal && (
+          <NavLink to="/profile" className="hover:underline cursor-pointer">
+            Create
+          </NavLink>
+          )}
         </div>
         {isAuthenticated ? (
-          <div className="relative">
-            <button
-              className={`${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold`}
-              onClick={toggleDropdown}>
-              <img src="/profile.png" className="w-8 h-8 rounded-full" />
-            </button>
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
-                <NavLink
-                  to="/profile"
-                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setDropdownOpen(false)}>
-                  Profile
-                </NavLink>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={logout}>
-                  Sign Out
-                </button>
-              </div>
-            )}
-          </div>
+          <div className="relative h-fit">
+          <button
+            className={`${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-1`}
+            onClick={toggleDropdown}>
+            <img src="/profile.png" className="w-6 h-6 rounded-full" />
+          </button>
+          {dropdownOpen && (
+            <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-50">
+              <NavLink
+                to="/profile"
+                className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                onClick={() => setDropdownOpen(false)}>
+                Profile
+              </NavLink>
+              <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={logout}>
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
         ) : (
           <button
             className="bg-[#12A3ED] hover:bg-[#1292ed] text-white font-bold py-2 px-4 rounded-lg cursor-pointer"

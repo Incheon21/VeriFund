@@ -12,7 +12,7 @@ type http_header =
 type VeriFund = 
  service {
    canReviewCampaign: (principal, text) -> (bool) query;
-   collectFund: (text, principal) -> (bool) query;
+   collectFund: (text, principal) -> (bool);
    createCampaign: (principal, text, text, nat, Time) -> (bool);
    deleteCampaignFile: (principal, text, text) -> (bool);
    donate: (principal, text, nat) -> (bool);

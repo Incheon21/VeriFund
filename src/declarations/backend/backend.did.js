@@ -44,7 +44,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
-    'collectFund' : IDL.Func([IDL.Text, IDL.Principal], [IDL.Bool], ['query']),
+    'collectFund' : IDL.Func([IDL.Text, IDL.Principal], [IDL.Bool], []),
     'createCampaign' : IDL.Func(
         [IDL.Principal, IDL.Text, IDL.Text, IDL.Nat, Time],
         [IDL.Bool],

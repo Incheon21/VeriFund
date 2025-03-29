@@ -28,7 +28,10 @@ export default function Profile() {
     loading: loadingCampaigns,
     error: errorCampaigns,
   } = useAsync(
-    () => (principal ? backendActor.getCampaignsByUser(Principal.fromText(principal)) : Promise.resolve([])),
+    () =>
+      principal
+        ? backendActor.getCampaignsByUser(Principal.fromText(principal))
+        : Promise.resolve([]),
     [principal, refreshTrigger]
   );
 
@@ -37,7 +40,10 @@ export default function Profile() {
     loading: loadingDonations,
     error: errorDonations,
   } = useAsync(
-    () => (principal ? backendActor.getDonationsByUser(Principal.fromText(principal)) : Promise.resolve([])),
+    () =>
+      principal
+        ? backendActor.getDonationsByUser(Principal.fromText(principal))
+        : Promise.resolve([]),
     [principal, refreshTrigger]
   );
 
@@ -51,8 +57,14 @@ export default function Profile() {
 
   const totalPagesCampaigns = Math.ceil(campaigns.length / 2);
   const totalPagesDonations = Math.ceil(donations.length / 2);
-  const paginatedCampaigns = campaigns.slice((currentPageCampaigns - 1) * 2, currentPageCampaigns * 2);
-  const paginatedDonations = donations.slice((currentPageDonations - 1) * 2, currentPageDonations * 2);
+  const paginatedCampaigns = campaigns.slice(
+    (currentPageCampaigns - 1) * 2,
+    currentPageCampaigns * 2
+  );
+  const paginatedDonations = donations.slice(
+    (currentPageDonations - 1) * 2,
+    currentPageDonations * 2
+  );
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -102,7 +114,14 @@ export default function Profile() {
           const end = Math.min(start + chunkSize, content.length);
           const chunk = content.slice(start, end);
 
-          await backendActor.uploadCampaignFile(Principal.fromText(principal), campaignId, file.name, chunk, BigInt(i), file.type);
+          await backendActor.uploadCampaignFile(
+            Principal.fromText(principal),
+            campaignId,
+            file.name,
+            chunk,
+            BigInt(i),
+            file.type
+          );
         }
         setAlert({
           type: "success",
@@ -121,9 +140,17 @@ export default function Profile() {
   }
 
   async function handleCampaignFileDelete(campaignId, fileName) {
-    if (window.confirm(`Are you sure you want to delete the file for this campaign?`)) {
+    if (
+      window.confirm(
+        `Are you sure you want to delete the file for this campaign?`
+      )
+    ) {
       try {
-        const success = await backendActor.deleteCampaignFile(Principal.fromText(principal), campaignId, fileName);
+        const success = await backendActor.deleteCampaignFile(
+          Principal.fromText(principal),
+          campaignId,
+          fileName
+        );
         if (success) {
           setAlert({ type: "success", message: "File deleted successfully!" });
           setRefreshTrigger((prev) => prev + 1);
@@ -156,22 +183,41 @@ export default function Profile() {
     }
   }
 
-  const handlePrevPageCampaigns = () => currentPageCampaigns > 1 && setCurrentPageCampaigns(currentPageCampaigns - 1);
-  const handleNextPageCampaigns = () => currentPageCampaigns < totalPagesCampaigns && setCurrentPageCampaigns(currentPageCampaigns + 1);
+  const handlePrevPageCampaigns = () =>
+    currentPageCampaigns > 1 &&
+    setCurrentPageCampaigns(currentPageCampaigns - 1);
+  const handleNextPageCampaigns = () =>
+    currentPageCampaigns < totalPagesCampaigns &&
+    setCurrentPageCampaigns(currentPageCampaigns + 1);
 
-  const handlePrevPageDonations = () => currentPageDonations > 1 && setCurrentPageDonations(currentPageDonations - 1);
-  const handleNextPageDonations = () => currentPageDonations < totalPagesDonations && setCurrentPageDonations(currentPageDonations + 1);
+  const handlePrevPageDonations = () =>
+    currentPageDonations > 1 &&
+    setCurrentPageDonations(currentPageDonations - 1);
+  const handleNextPageDonations = () =>
+    currentPageDonations < totalPagesDonations &&
+    setCurrentPageDonations(currentPageDonations + 1);
 
-  return (
-    <div className="min-h-screen text-gray-900 mt-6">
-      <main className="container mx-auto px-6 py-8">
-        {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
+  if (principal) {
+    return (
+      <div className="min-h-screen text-gray-900 mt-12">
+        <main className="container mx-auto px-6 py-8">
+          {alert && (
+            <Alert
+              type={alert.type}
+              message={alert.message}
+              onClose={() => setAlert(null)}
+            />
+          )}
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Profile & Create Campaign */}
-          <section className="bg-white rounded-lg shadow-lg p-4">
-            <h2 className="text-2xl font-semibold text-gray-700 mb-4">👤 Profile</h2>
-            <p className="bg-gray-100 rounded-md p-3 text-gray-600 font-mono">{principal}</p>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Profile & Create Campaign */}
+            <section className="bg-white rounded-lg shadow-lg p-4">
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+                👤 Profile
+              </h2>
+              <p className="bg-gray-100 rounded-md p-3 text-gray-600 font-mono">
+                {principal}
+              </p>
 
             <h3 className="text-xl font-semibold text-gray-700 mt-6 mb-4">Create a New Campaign</h3>
             <form onSubmit={createCampaign} className="space-y-4">
@@ -362,4 +408,5 @@ export default function Profile() {
       </main>
     </div>
   );
-}
+}}
+

@@ -143,6 +143,31 @@ const Home = () => {
         </div>
       </section>
 
+      <section className="bg-[#12A3ED] w-full py-12">
+        <div className="w-[80%] mx-auto text-center text-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            {[
+              "Donations You Can Trust",
+              "Proof-of-Usage, Not Just Promises",
+              "Decentralized, Borderless, Built on ICP",
+            ].map((point, index) => (
+              <div key={index} className="flex flex-col items-center justify-center">
+                <h3 className="text-2xl font-semibold">{point}</h3>
+                {index < 2 && (
+                  <div className="hidden md:block absolute h-24 w-px bg-white"
+                    style={{
+                      right: `calc(${(100 / 3) * (index + 1)}% - 0.5px)`,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                    }}
+                  ></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="about-section" className="w-[80%] flex justify-center py-20">
         <div className="w-full text-justify flex flex-col items-center gap-10">
           <h2 className="text-4xl font-bold text-gray-800 text-center">
