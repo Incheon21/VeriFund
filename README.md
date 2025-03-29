@@ -1,8 +1,8 @@
-# VeriFund
-
-< Insert Front Page Image Here >
-
-<div align="center"> <h1> Secure your kindness with Verifund! </h1> </div> <br>
+<div align="center"> 
+  <h1> VeriFund </h1>
+  <h3> Secure your kindness with Verifund! </h3>
+  < Insert Front Page Image Here >
+</div> <br>
 
 <div align="center"> 
 
@@ -19,6 +19,12 @@
 **VeriFund** is a decentralized, trustless platform built to revolutionize how people give. Powered by the Internet Computer, VeriFund allows anyone to create or contribute to donation campaigns with transparency, verifiability, and global accessibility.
 
 Every donation is stored on-chain, publicly auditable, and protected by smart contract rules — ensuring that funds are not only received, but responsibly used. With a unique **proof-of-donation** and **proof-of-usage** model, VeriFund builds a culture of accountability without compromise.
+
+## Table of Contents
+- [Introduction](#introduction)
+- [Solution & Opportunity: VeriFund](#solution--opportunity-verifund)
+- [Architecture](#architecture)
+- [Flowchart](#flowchart)
 
 
 ## Why?
@@ -81,7 +87,7 @@ This makes ICP the only chain where a system like VeriFund could emerge without 
 
 To create a global standard for transparent, trustless, and verifiable charitable giving using decentralized technologies.
 
-### Mission
+### Vision
 
 1. Make donations verifiable
 2. Break down global donation barriers
