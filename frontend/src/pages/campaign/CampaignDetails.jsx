@@ -6,7 +6,7 @@ import { useAuth } from "../../utils/auth";
 import { Principal } from "@dfinity/principal";
 import useAsync from "../../hooks/useAsync";
 
-export default function CampaignDetails({ setRoute, id }) {
+export default function CampaignDetails({ id }) {
   const { principal, login } = useAuth();
   const [campaign, setCampaign] = useState(null);
   const [donations, setDonations] = useState([]);

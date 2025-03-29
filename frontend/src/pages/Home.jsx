@@ -4,7 +4,7 @@ import { backendActor } from "../utils/backendActor";
 import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 
-const Home = ({ setRoute }) => {
+const Home = ({}) => {
   const canvasRef = useRef(null);
   const { principal } = useAuth();
   const [alert, setAlert] = useState(null);
@@ -120,7 +120,7 @@ const Home = ({ setRoute }) => {
           <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full" style={{ imageRendering: "crisp-edges" }} />
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 p-5 text-gray-800 font-bold text-center z-10">
             <h1 className="text-4xl">VeriFund</h1>
-            <h2 className="text-xl">Empower Your Event, Amplify Your Impact</h2>
+            <h2 className="text-xl">Secure your kindness with Verifund!</h2>
           </div>
         </div>
       </section>

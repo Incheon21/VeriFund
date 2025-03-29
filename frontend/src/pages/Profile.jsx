@@ -5,7 +5,7 @@ import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
 import useAsync from "../hooks/useAsync";
 
-export default function Profile({ setRoute }) {
+export default function Profile() {
   const { principal } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [donations, setDonations] = useState([]);

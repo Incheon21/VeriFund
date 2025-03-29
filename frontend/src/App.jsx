@@ -4,7 +4,9 @@ import Explore from "./pages/Explore.jsx";
 import CampaignDetails from "./pages/campaign/CampaignDetails.jsx";
 import Auditors from "./pages/Auditors.jsx";
 import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
 import { AuthProvider } from "./utils/auth.jsx";
+import { useState } from "react";
 
 export default function App() {
   const [route, setRoute] = useState("/");
@@ -17,11 +19,11 @@ export default function App() {
         <Navbar setRoute={setRoute} />
         <main className="relative flex-grow flex w-full items-center justify-center z-10">
           <>
-            {route === "/" && <Home setRoute={setRoute} />}
-            {route === "/profile" && <Profile setRoute={setRoute} />}
-            {route === "/explore" && <Explore setRoute={setRoute} />}
-            {route.startsWith("/campaign") && <CampaignDetails setRoute={setRoute} id={route.split("/")[2]} />}
-            {route === "/auditors" && <Auditors setRoute={setRoute} />}
+            {route === "/" && <Home />}
+            {route === "/profile" && <Profile />}
+            {route === "/explore" && <Explore />}
+            {route.startsWith("/campaign") && <CampaignDetails id={route.split("/")[2]} />}
+            {route === "/auditors" && <Auditors />}
           </>
         </main>
 

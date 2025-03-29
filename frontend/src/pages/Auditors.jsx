@@ -5,7 +5,7 @@ import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
 import { getFormattedDate } from "../utils/date";
 
-export default function Auditors({ setRoute }) {
+export default function Auditors() {
   const { principal } = useAuth();
   const [stake, setStake] = useState(0);
   const [campaigns, setCampaigns] = useState([]);

@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router";
-import { Principal } from "@dfinity/principal";
 import { useAuth } from "../utils/auth";
 import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
 import useAsync from "../hooks/useAsync";
 import { getFormattedDate } from "../utils/date";
 
-export default function Explore({ setRoute }) {
-  const { principal } = useAuth();
+export default function Explore({}) {
   const [campaigns, setCampaigns] = useState([]);
   const [alert, setAlert] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [donationAmounts, setDonationAmounts] = useState({});
 
   const { data: campaignsData, loading, error } = useAsync(() => backendActor.getCampaigns(), []);
   const { data, loading: loadingUSD, error: errorUSD } = useAsync(() => backendActor.getICPUSD(), [backendActor]);
@@ -27,11 +24,9 @@ export default function Explore({ setRoute }) {
 
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
-  const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
 
   return (
     <div className="w-full min-h-screen mt-12 text-gray-900">
-      {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Explore Campaigns</h1>
