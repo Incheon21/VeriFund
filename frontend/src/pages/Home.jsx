@@ -11,26 +11,21 @@ const Home = () => {
 
     const ctx = canvas.getContext("2d");
     
-    // Adjust for device pixel ratio to make sharper lines
     const pixelRatio = window.devicePixelRatio || 1;
     const width = canvas.width = window.innerWidth * pixelRatio;
     const height = canvas.height = window.innerHeight * pixelRatio;
     
-    // Set canvas size but maintain display size
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
     
-    // Scale context according to device pixel ratio
     ctx.scale(pixelRatio, pixelRatio);
     
-    // Particle settings
     const particleCount = 80;
     const particles = [];
     const connectionDistance = 120;
-    const lineColor = "rgba(60, 60, 60, 0.75)";  // Darker gray with less transparency
-    const nodeColor = "rgba(40, 40, 40, 0.6)";   // Even darker nodes
+    const lineColor = "rgba(60, 60, 60, 0.75)";
+    const nodeColor = "rgba(40, 40, 40, 0.6)";
     
-    // Create particles
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * window.innerWidth,
@@ -42,27 +37,21 @@ const Home = () => {
       });
     }
     
-    // Animation function
     const animate = () => {
       ctx.clearRect(0, 0, width, height);
       
-      // Update and draw particles
       particles.forEach(particle => {
-        // Move particle
         particle.x += particle.speedX;
         particle.y += particle.speedY;
         
-        // Bounce on edges
         if (particle.x < 0 || particle.x > window.innerWidth) particle.speedX *= -1;
         if (particle.y < 0 || particle.y > window.innerHeight) particle.speedY *= -1;
         
-        // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fillStyle = nodeColor;
         ctx.fill();
         
-        // Draw lines only to particles with higher IDs
         particles.forEach(otherParticle => {
           if (particle.uniqueId < otherParticle.uniqueId) {
             const dx = particle.x - otherParticle.x;
@@ -70,18 +59,15 @@ const Home = () => {
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             if (distance < connectionDistance) {
-              // Calculate opacity based on distance
               const opacity = 1 - (distance / connectionDistance);
               
               ctx.beginPath();
               ctx.moveTo(particle.x, particle.y);
               ctx.lineTo(otherParticle.x, otherParticle.y);
               
-              // Make lines more crisp with higher opacity
               ctx.strokeStyle = `rgba(60, 60, 60, ${opacity * 0.75 + 0.1})`;
-              ctx.lineWidth = 1;  // Increased line width
+              ctx.lineWidth = 1;
               
-              // Use crisp line rendering
               ctx.imageSmoothingEnabled = false;
               ctx.stroke();
             }
@@ -94,7 +80,6 @@ const Home = () => {
     
     animate();
     
-    // Resize handler
     const handleResize = () => {
       const newPixelRatio = window.devicePixelRatio || 1;
       canvas.width = window.innerWidth * newPixelRatio;
@@ -106,7 +91,6 @@ const Home = () => {
     
     window.addEventListener('resize', handleResize);
     
-    // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
     };

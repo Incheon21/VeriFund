@@ -79,25 +79,17 @@ export default function Auditors() {
     }
   };
 
-  // Download campaign file and select campaign for review
-  const handleDownloadFile = async (campaign) => {
-    if (!campaign.file) {
-      return setAlert({
-        type: "error",
-        message: "No file attached to this campaign.",
-      });
-    }
-
+  async function handleDownloadFile(campaignId, fileName) {
     try {
       const totalChunks = Number(
-        await backendActor.getCampaignFileTotalChunks(campaign.id)
+        await backendActor.getCampaignFileTotalChunks(campaignId)
       );
-      const fileType = await backendActor.getCampaignFileType(campaign.id);
+      const fileType = await backendActor.getCampaignFileType(campaignId);
       let chunks = [];
 
       for (let i = 0; i < totalChunks; i++) {
         const chunkBlob = await backendActor.getCampaignFileChunk(
-          campaign.id,
+          campaignId,
           i
         );
         if (chunkBlob) {
@@ -111,24 +103,20 @@ export default function Auditors() {
       const url = URL.createObjectURL(data);
       const link = document.createElement("a");
       link.href = url;
-      link.download = campaign.file.name;
+      link.download = fileName;
       link.click();
-
-      // Clean up
       URL.revokeObjectURL(url);
       setAlert({
         type: "success",
-        message: `File ${campaign.file.name} downloaded successfully!`,
-        message: `File ${campaign.file.name} downloaded successfully!`,
+        message: `File ${fileName} downloaded successfully!`,
       });
     } catch (error) {
-      console.error("File download error:", error);
       setAlert({
         type: "error",
-        message: "Failed to download campaign proof file.",
+        message: `Failed to download ${fileName}: ${error.message}`,
       });
     }
-  };
+  }
 
   const handleAuditorDecision = async (campaign, approve) => {
     if (!campaign) return;
@@ -151,7 +139,6 @@ export default function Auditors() {
             : "Campaign rejected. Campaign returned to active status.",
         });
 
-        // Reload campaigns
         loadData();
       } else {
         throw new Error("Decision couldn't be processed");
@@ -162,7 +149,6 @@ export default function Auditors() {
     }
   };
 
-  // Change page for pagination
   const changePage = (delta) => {
     setCurrentPage((prevPage) =>
       Math.max(1, Math.min(totalPages, prevPage + delta))
@@ -180,7 +166,7 @@ export default function Auditors() {
     <div className="w-full text-gray-900 pt-6">
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          🕵️‍♂️ Auditor Dashboard
+          Auditor Dashboard
         </h1>
 
         {alert && (
@@ -193,7 +179,7 @@ export default function Auditors() {
 
         <section className="bg-white rounded-lg shadow-lg p-6 mb-8">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            🔐 Your Stake
+            Your Stake
           </h2>
 
           <div className="mb-6">
@@ -223,7 +209,7 @@ export default function Auditors() {
         {/* Campaigns section */}
         <section className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            📋 Campaigns Pending Review
+            Campaigns Pending Review
           </h2>
 
           {isLoading ? (
@@ -286,22 +272,43 @@ export default function Auditors() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t border-gray-200">
-                      <div className="ml-auto flex gap-2">
+                    {campaign.file && campaign.file.length > 0 ? (
+                      <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t justify-between border-gray-200">
                         <button
-                          onClick={() => handleAuditorDecision(campaign, false)}
-                          className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600"
+                          onClick={() =>
+                            handleDownloadFile(
+                              campaign.id,
+                              campaign.file[0].name
+                            )
+                          }
+                          className="bg-slate-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-600"
                         >
-                          ❌ Reject
+                          Download Proof
                         </button>
-                        <button
-                          onClick={() => handleAuditorDecision(campaign, true)}
-                          className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600"
-                        >
-                          ✅ Approve
-                        </button>
+                        <div className="ml-auto flex gap-2">
+                          <button
+                            onClick={() =>
+                              handleAuditorDecision(campaign, false)
+                            }
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleAuditorDecision(campaign, true)
+                            }
+                            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600"
+                          >
+                            Approve
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <p className="text-gray-500 italic border-gray-200 border-t pt-2">
+                        Proof not yet submitted
+                      </p>
+                    )}
                   </li>
                 ))}
               </ul>
