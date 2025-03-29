@@ -12,7 +12,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <AuthProvider>
         <div className="flex flex-col w-full bg-white min-h-screen overflow-hidden">
-          {/* Top-left radial blur light */}
           <div className="fixed top-0 left-0 w-128 h-128 bg-[#125fed] opacity-10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 z-0"></div>
 
           <Navbar />
@@ -21,7 +20,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           </main>
 
           <div className="fixed bottom-0 right-0 w-128 h-128 bg-[#125fed] opacity-10 rounded-full blur-3xl translate-x-1/2 translate-y-1/2 z-0"></div>
-          {/* Bottom-right radial blur light */}
 
           <Footer />
         </div>

@@ -12,10 +12,10 @@ type http_header =
 type VeriFund = 
  service {
    canReviewCampaign: (principal, text) -> (bool) query;
+   collectFund: (text, principal) -> (bool) query;
    createCampaign: (principal, text, text, nat, Time) -> (bool);
    deleteCampaignFile: (principal, text, text) -> (bool);
    donate: (principal, text, nat) -> (bool);
-   getAuditor: (text) -> (opt principal) query;
    getCampaignFileChunk: (text, nat) -> (opt blob) query;
    getCampaignFileTotalChunks: (text) -> (nat) query;
    getCampaignFileType: (text) -> (opt text) query;
@@ -28,14 +28,12 @@ type VeriFund =
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
    getPendingReviewCampaigns: () -> (vec Campaign) query;
-   pickAuditor: (text) -> (bool);
+   getReleasedCampaigns: (principal) -> (vec text);
    releaseDecision: (principal, text, bool) -> (bool);
    requestFundRelease: (principal, text) -> (bool);
    stakeAsAuditor: (principal, nat) -> (bool);
-   transform: (record {
-                 context: blob;
-                 response: http_request_result;
-               }) -> (http_request_result) query;
+   transform: (record {response: http_request_result;}) ->
+    (http_request_result) query;
    uploadCampaignFile: (principal, text, text, blob, nat, text) -> (bool);
    whoami: () -> (principal) query;
  };
@@ -61,6 +59,7 @@ type Donation =
 type CampaignStatus = 
  variant {
    active;
+   collected;
    pending_release;
    released;
  };

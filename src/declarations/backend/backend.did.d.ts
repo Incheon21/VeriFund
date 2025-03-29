@@ -15,6 +15,7 @@ export interface Campaign {
 }
 export type CampaignStatus = { 'active' : null } |
   { 'released' : null } |
+  { 'collected' : null } |
   { 'pending_release' : null };
 export interface Donation {
   'timestamp' : Time,
@@ -31,13 +32,13 @@ export interface FileChunk { 'chunk' : Uint8Array | number[], 'index' : bigint }
 export type Time = bigint;
 export interface VeriFund {
   'canReviewCampaign' : ActorMethod<[Principal, string], boolean>,
+  'collectFund' : ActorMethod<[string, Principal], boolean>,
   'createCampaign' : ActorMethod<
     [Principal, string, string, bigint, Time],
     boolean
   >,
   'deleteCampaignFile' : ActorMethod<[Principal, string, string], boolean>,
   'donate' : ActorMethod<[Principal, string, bigint], boolean>,
-  'getAuditor' : ActorMethod<[string], [] | [Principal]>,
   'getCampaignFileChunk' : ActorMethod<
     [string, bigint],
     [] | [Uint8Array | number[]]
@@ -53,12 +54,12 @@ export interface VeriFund {
   'getMyPendingCampaigns' : ActorMethod<[Principal], Array<string>>,
   'getMyStake' : ActorMethod<[Principal], bigint>,
   'getPendingReviewCampaigns' : ActorMethod<[], Array<Campaign>>,
-  'pickAuditor' : ActorMethod<[string], boolean>,
+  'getReleasedCampaigns' : ActorMethod<[Principal], Array<string>>,
   'releaseDecision' : ActorMethod<[Principal, string, boolean], boolean>,
   'requestFundRelease' : ActorMethod<[Principal, string], boolean>,
   'stakeAsAuditor' : ActorMethod<[Principal, bigint], boolean>,
   'transform' : ActorMethod<
-    [{ 'context' : Uint8Array | number[], 'response' : http_request_result }],
+    [{ 'response' : http_request_result }],
     http_request_result
   >,
   'uploadCampaignFile' : ActorMethod<

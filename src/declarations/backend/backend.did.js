@@ -3,6 +3,7 @@ export const idlFactory = ({ IDL }) => {
   const CampaignStatus = IDL.Variant({
     'active' : IDL.Null,
     'released' : IDL.Null,
+    'collected' : IDL.Null,
     'pending_release' : IDL.Null,
   });
   const FileChunk = IDL.Record({
@@ -43,6 +44,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         ['query'],
       ),
+    'collectFund' : IDL.Func([IDL.Text, IDL.Principal], [IDL.Bool], ['query']),
     'createCampaign' : IDL.Func(
         [IDL.Principal, IDL.Text, IDL.Text, IDL.Nat, Time],
         [IDL.Bool],
@@ -54,7 +56,6 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'donate' : IDL.Func([IDL.Principal, IDL.Text, IDL.Nat], [IDL.Bool], []),
-    'getAuditor' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Principal)], ['query']),
     'getCampaignFileChunk' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Opt(IDL.Vec(IDL.Nat8))],
@@ -87,7 +88,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getMyStake' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
     'getPendingReviewCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
-    'pickAuditor' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'getReleasedCampaigns' : IDL.Func([IDL.Principal], [IDL.Vec(IDL.Text)], []),
     'releaseDecision' : IDL.Func(
         [IDL.Principal, IDL.Text, IDL.Bool],
         [IDL.Bool],
@@ -96,12 +97,7 @@ export const idlFactory = ({ IDL }) => {
     'requestFundRelease' : IDL.Func([IDL.Principal, IDL.Text], [IDL.Bool], []),
     'stakeAsAuditor' : IDL.Func([IDL.Principal, IDL.Nat], [IDL.Bool], []),
     'transform' : IDL.Func(
-        [
-          IDL.Record({
-            'context' : IDL.Vec(IDL.Nat8),
-            'response' : http_request_result,
-          }),
-        ],
+        [IDL.Record({ 'response' : http_request_result })],
         [http_request_result],
         ['query'],
       ),

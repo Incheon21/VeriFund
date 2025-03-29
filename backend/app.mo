@@ -9,9 +9,7 @@ import Option "mo:base/Option";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
-import Nat8 "mo:base/Nat8";
 import Principal "mo:base/Principal";
-import Random "mo:base/Random";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
 import Timer "mo:base/Timer";
@@ -19,8 +17,6 @@ import IC "ic:aaaaa-aa";
 import HashMapMap "mo:map/Map";
 
 actor class VeriFund() = this {
-
-  // Types
   type FileChunk = {
     chunk : Blob;
     index : Nat;
@@ -35,7 +31,7 @@ actor class VeriFund() = this {
 
   type UserFiles = HashMapMap.Map<Text, File>;
 
-  type CampaignStatus = { #active; #pending_release; #released };
+  type CampaignStatus = { #active; #pending_release; #released; #collected };
 
   type Campaign = {
     id: Text;
@@ -46,7 +42,7 @@ actor class VeriFund() = this {
     collected: Nat;
     status: CampaignStatus;
     date: Time.Time;
-    file: ?File; // Store the actual File object
+    file: ?File; 
   };
 
   type Donation = {
@@ -63,7 +59,6 @@ actor class VeriFund() = this {
   stable var certifiedState : Blob = Blob.fromArray([]);
 
   // WORKING HASHMAPBases
-  var files = HashMapMap.new<Principal, UserFiles>();
   var campaigns : HashMapBase.HashMap<Text, Campaign> = HashMapBase.fromIter<Text, Campaign>(campaignsStore.vals(), 0, Text.equal, Text.hash);
   var donations : HashMapBase.HashMap<Text, [Donation]> = HashMapBase.fromIter<Text, [Donation]>(donationsStore.vals(), 0, Text.equal, Text.hash);
   var stakes : HashMapBase.HashMap<Principal, Nat> = HashMapBase.fromIter<Principal, Nat>(stakesStore.vals(), 0, Principal.equal, Principal.hash);
@@ -223,13 +218,10 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
     case (?camp) {
       if (camp.status != #active) return false;
       
-      // Calculate the new collected amount
       let newCollected = camp.collected + amount;
       
-      // Determine if we should change status to pending_release
       let newStatus = if (newCollected >= camp.target) #pending_release else camp.status;
       
-      // Update the campaign with new collected amount and possibly new status
       campaigns.put(id, { 
         camp with 
         collected = newCollected;
@@ -249,24 +241,17 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
       donations.put(id, updated);
       updateCertifiedData();
       
-      // If status changed to pending_release, let's try to pick an auditor
-      if (newStatus == #pending_release) {
-        ignore pickAuditor(id);
-      };
-      
       return true;
     };
   };
 };
 
-  // Allow user to stake ICP to become an auditor
   public func stakeAsAuditor(who: Principal,amount: Nat): async Bool {
     let prev = Option.get(stakes.get(who), 0);
     stakes.put(who, prev + amount);
     return true;
   };
 
-  // Auditor decision to release or reject fund release
   public func releaseDecision(who: Principal, id: Text, approve: Bool): async Bool {
     switch (auditors.get(id)) {
       case (?aud) if (aud != who) return false;
@@ -284,18 +269,6 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
     };
   };
 
-  // Select a random auditor for a campaign (used internally or externally)
-  public shared func pickAuditor(id: Text): async Bool {
-    let keys = Iter.toArray(stakes.keys());
-    if (Array.size(keys) == 0) return false;
-    let rand = await Random.blob();
-    let byte = Blob.toArray(rand)[0];
-    let i = Nat8.toNat(byte) % Array.size(keys);
-    let selected = keys[i];
-    auditors.put(id, selected);
-    return true;
-  };
-
   // Reminder logic run daily — updates reminderFlags per fundraiser
   private func remind() : async () {
     reminderFlags := HashMapBase.HashMap<Principal, [Text]>(0, Principal.equal, Principal.hash);
@@ -310,7 +283,6 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
 
 // This transform function is required for HTTPS outcalls to strip headers.
   public query func transform({
-    context : Blob;
     response : IC.http_request_result;
   }) : async IC.http_request_result {
     {
@@ -385,7 +357,6 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
   };
 };
 
-// Get campaigns pending for review by auditors
 public query func getPendingReviewCampaigns(): async [Campaign] {
   let filtered = Iter.filter<(Text, Campaign)>(
     campaigns.entries(),
@@ -419,7 +390,6 @@ public query func canReviewCampaign(reviewer: Principal, campaignId: Text): asyn
     };
   };
 };
-
 
   // Queries
   public query func getCampaigns(): async [Campaign] {
@@ -456,10 +426,6 @@ public query func canReviewCampaign(reviewer: Principal, campaignId: Text): asyn
     });
   };
 
-  public query func getAuditor(id: Text): async ?Principal {
-    auditors.get(id);
-  };
-
   public query func getMyStake(who: Principal): async Nat {
     Option.get(stakes.get(who), 0);
   };
@@ -467,5 +433,31 @@ public query func canReviewCampaign(reviewer: Principal, campaignId: Text): asyn
   public query (message) func whoami() : async Principal {
     message.caller;
   };
+
+  public func getReleasedCampaigns(user: Principal) : async [Text] {
+    var releasedCampaigns: [Text] = [];
+
+    for ((id, campaign) in campaigns.entries()) {
+        if (campaign.owner == user and campaign.status == #released) {
+            releasedCampaigns := Array.append(releasedCampaigns,[campaign.title]);
+        };
+    };
+
+    return releasedCampaigns;
+  };
+
+  public query func collectFund(campaignId: Text, user: Principal) : async Bool {
+      switch (campaigns.get(campaignId)) {
+          case (?c) {
+              if (c.owner == user and c.status == #released) {
+                  campaigns.put(campaignId, { c with status = #collected });
+                  return true;
+              } else {
+                  return false;
+              }
+          };
+          case null { return false };
+      }
+  }
 };
 

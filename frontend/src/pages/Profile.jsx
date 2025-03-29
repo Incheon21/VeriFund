@@ -20,6 +20,8 @@ export default function Profile() {
 
   const [currentPageCampaigns, setCurrentPageCampaigns] = useState(1);
   const [currentPageDonations, setCurrentPageDonations] = useState(1);
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const minDate = tomorrow.toISOString().split("T")[0];
 
   const {
     data: campaignsData,
@@ -75,7 +77,6 @@ export default function Profile() {
         setRefreshTrigger((prev) => prev + 1); // trigger refresh
       }
     } catch (error) {
-      console.error("Error creating campaign:", error);
       setAlert({ type: "error", message: "Error creating campaign." });
     }
   };
@@ -138,36 +139,19 @@ export default function Profile() {
     }
   }
 
-  async function handleCampaignFileDownload(campaignId, fileName) {
-    try {
-      const totalChunks = Number(await backendActor.getCampaignFileTotalChunks(campaignId));
-      const fileType = await backendActor.getCampaignFileType(campaignId);
-      let chunks = [];
-
-      for (let i = 0; i < totalChunks; i++) {
-        const chunkBlob = await backendActor.getCampaignFileChunk(campaignId, i);
-        if (chunkBlob) {
-          chunks.push(chunkBlob[0]);
-        } else {
-          throw new Error(`Failed to retrieve chunk ${i}`);
-        }
+  async function handleCollectFunds(campaignId){
+    try{
+      const success = await backendActor.collectFund(campaignId, Principal.fromText(principal));
+      if (success) {
+        setAlert({ type: "success", message: "Funds collected successfully!" });
+        setRefreshTrigger((prev) => prev + 1);
+      } else {
+        setAlert({ type: "error", message: "Failed to collect funds" });
       }
-
-      const data = new Blob(chunks, { type: fileType });
-      const url = URL.createObjectURL(data);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName;
-      link.click();
-      URL.revokeObjectURL(url);
-      setAlert({
-        type: "success",
-        message: `File ${fileName} downloaded successfully!`,
-      });
     } catch (error) {
       setAlert({
         type: "error",
-        message: `Failed to download ${fileName}: ${error.message}`,
+        message: `Failed to collect fund: ${error.message}`,
       });
     }
   }
@@ -229,6 +213,7 @@ export default function Profile() {
                   <input
                     type="date"
                     name="date"
+                    min={minDate}
                     value={formData.date}
                     onChange={handleInputChange}
                     className="w-full border-gray-300 rounded-lg shadow-sm px-3 py-2"
@@ -245,7 +230,7 @@ export default function Profile() {
           {/* Campaigns & Donations */}
           <section className="space-y-8">
             <section className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">📢 My Campaigns</h2>
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">My Campaigns</h2>
               {loadingCampaigns && <p>Loading campaigns...</p>}
               {errorCampaigns && <p className="text-red-500">{errorCampaigns}</p>}
               {campaigns.length === 0 ? (
@@ -272,29 +257,34 @@ export default function Profile() {
                         <p className="text-sm text-gray-500">
                           <strong>Proof:</strong> {camp.file?.[0]?.name ? camp.file[0].name : "no proof"}
                         </p>
-                        <div className="mt-4 flex items-center space-x-4">
-                          <input
-                            type="file"
-                            onChange={(e) => handleCampaignFileUpload(camp.id, e)}
-                            className="text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
-                          />
-                          {camp.file && (
-                            <>
+                        {Object.keys(camp.status)[0]!="collected"&&(
+                          <>
+                            {Object.keys(camp.status)[0]!="released" ? (
+                              <div className="mt-4 flex w-full items-center justify-between space-x-4">
+                                <input
+                                  type="file"
+                                  onChange={(e) => handleCampaignFileUpload(camp.id, e)}
+                                  className="text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100"
+                                />
+                                {camp.file && (
+                                  <button
+                                    onClick={() => handleCampaignFileDelete(camp.id, camp.file[0].name)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
+                                  >
+                                    Delete File
+                                  </button>
+                                )}
+                              </div>
+                            ):(
                               <button
-                                onClick={() => handleCampaignFileDownload(camp.id, camp.file[0].name)}
-                                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600"
+                                onClick={() => handleCollectFunds(camp.id)}
+                                className="bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 mt-4"
                               >
-                                Download File
+                                Collect
                               </button>
-                              <button
-                                onClick={() => handleCampaignFileDelete(camp.id, camp.file[0].name)}
-                                className="bg-red-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-red-600"
-                              >
-                                Delete File
-                              </button>
-                            </>
-                          )}
-                        </div>
+                            )}
+                          </>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -324,7 +314,7 @@ export default function Profile() {
             </section>
 
             <section className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-semibold text-gray-700 mb-4">💰 My Donations</h2>
+              <h2 className="text-2xl font-semibold text-gray-700 mb-4">My Donations</h2>
               {loadingDonations && <p>Loading donations...</p>}
               {errorDonations && <p className="text-red-500">{errorDonations}</p>}
               {donations.length === 0 ? (
@@ -350,7 +340,6 @@ export default function Profile() {
                         disabled={currentPageDonations === 1}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                       >
-                        {" "}
                         Prev
                       </button>
                       <span>
@@ -361,7 +350,6 @@ export default function Profile() {
                         disabled={currentPageDonations === totalPagesDonations}
                         className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                       >
-                        {" "}
                         Next
                       </button>
                     </div>
