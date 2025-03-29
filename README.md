@@ -113,7 +113,7 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 | Staking + Reward Mechanism| Auditors stake ICP to be eligible. Honest auditors get rewards, lazy ones get penalized.       |
 | Reminder System (Timers)  | Daily on-chain reminders encourage fundraisers to submit proof.                                |
 | Live ICP/USD Conversion   | Uses HTTPS outcalls to Coinbase API for accurate pricing.                                  |
-| Global, Borderless Platform | Open to everyone worldwide — no banks, no borders, just trustless giving.                     |
+| Global, Borderless Platform | Open to everyone worldwide — no banks, no borders, just trustless giving.                    
 
 ### Donation & Proof Flow
 
