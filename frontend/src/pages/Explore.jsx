@@ -17,12 +17,17 @@ export default function Explore() {
   const { principal } = useAuth();
   const [alert, setAlert] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [donationAmounts, setDonationAmounts] = useState({}); 
 
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
 
   const handlePrevPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
+
+  const handleDonationChange = (campaignId, amount) => {
+    setDonationAmounts((prev) => ({ ...prev, [campaignId]: amount }));
   };
 
   const handleNextPage = () => {
@@ -39,7 +44,13 @@ export default function Explore() {
     }
   };
 
-  const donateToCampaign = async (campaignId, amount) => {
+  const donateToCampaign = async (campaignId) => {
+    const amount = donationAmounts[campaignId];
+    if (!amount || isNaN(amount) || amount <= 0) {
+      setAlert({ type: "error", message: "Please enter a valid donation amount." });
+      return;
+    }
+
     try {
       const result = await backendActor.donate(Principal.fromText(principal), campaignId, BigInt(amount));
       if (result) {
@@ -105,17 +116,27 @@ export default function Explore() {
                     <p className="text-sm text-gray-500 mb-4">
                       <strong>Owner:</strong> {camp.owner.toText()}
                     </p>
-                    <div className="flex justify-between">
-                      <NavLink
-                        to={`/campaign/${camp.id}`}
-                        className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition">
-                        View Details
-                      </NavLink>
-                      <button
-                        onClick={() => donateToCampaign(camp.id, 10)}
-                        className="inline-block rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 transition">
-                        Donate 10 ICP
-                      </button>
+                    <div className="flex flex-col space-y-2">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="Enter amount (ICP)"
+                        value={donationAmounts[camp.id] || ""}
+                        onChange={(e) => handleDonationChange(camp.id, e.target.value)}
+                        className="w-full px-4 py-2 border rounded-lg"
+                      />
+                      <div className="flex justify-between">
+                        <NavLink
+                          to={`/campaign/${camp.id}`}
+                          className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition">
+                          View Details
+                        </NavLink>
+                        <button
+                          onClick={() => donateToCampaign(camp.id)}
+                          className="inline-block rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600 transition">
+                          Donate
+                        </button>
+                      </div>
                     </div>
                   </li>
                 );
