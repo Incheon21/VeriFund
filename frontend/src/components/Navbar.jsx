@@ -26,6 +26,7 @@ const Navbar = () => {
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }, 100);
             }}>
+            }}>
             Home
           </NavLink>
           <NavLink
@@ -41,6 +42,7 @@ const Navbar = () => {
                 }
               }, 100);
             }}>
+            }}>
             About
           </NavLink>
           <NavLink to="/explore" className="hover:underline">
@@ -52,7 +54,10 @@ const Navbar = () => {
         </div>
         {isAuthenticated ? (
           <div>
+          <div>
             <button
+              className={` ${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-2`}
+              onClick={toggleDropdown}>
               className={` ${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-2`}
               onClick={toggleDropdown}>
               <img src="/profile.png" className="w-8 h-8 rounded-full" />
@@ -63,8 +68,10 @@ const Navbar = () => {
                   to="/profile"
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                   onClick={() => setDropdownOpen(false)}>
+                  onClick={() => setDropdownOpen(false)}>
                   Profile
                 </NavLink>
+                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={logout}>
                 <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" onClick={logout}>
                   Sign Out
                 </button>

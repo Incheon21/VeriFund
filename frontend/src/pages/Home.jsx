@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../utils/auth.jsx";
 
-// Reusable button component
 const Button = ({ onClick, children, className }) => (
   <button onClick={onClick} className={`bg-[#12A3ED] hover:bg-[#1292ed] text-white font-bold py-2 px-4 rounded-lg ${className}`}>
     {children}
@@ -48,21 +47,15 @@ const Home = () => {
               </p>
             </div>
           </div>
-
-          <Button onClick={whoami} className="mb-4">
-            Whoami
-          </Button>
-
           {principal && (
             <div className="mt-4">
               <h3 className="text-xl font-bold">Your principal ID is:</h3>
               <p className="text-lg p-2 mt-2 rounded break-all">{principal}</p>
             </div>
           )}
-
-          <div className="mt-4">
-            <h3 className="font-bold">Authentication Status:</h3>
-            <p>{isAuthenticated ? "Logged In" : "Not Logged In"}</p>
+          <div className="mt-6">
+            <h3 className="text-xl font-bold text-gray-800">Authentication Status</h3>
+            <p className="text-lg text-gray-700">{isAuthenticated ? "Logged In" : "Not Logged In"}</p>
           </div>
         </div>
       </section>
@@ -90,11 +83,13 @@ const Home = () => {
             </p>
           </div>
           <div className="w-full flex flex-col">
-            <h3 className="text-2xl">Mission</h3>
-            <p>1. Make donations verifiable</p>
-            <p>2. Break down global donation barriers</p>
-            <p>3. Establish trust through blockchain technology</p>
-            <p>4. Reward responsible fundraisers and auditors</p>
+            <h3 className="text-2xl font-bold text-gray-800">Mission</h3>
+            <ul className="text-lg text-gray-700 list-disc list-inside mt-2 space-y-1">
+              <li>Make donations verifiable</li>
+              <li>Break down global donation barriers</li>
+              <li>Establish trust through blockchain technology</li>
+              <li>Reward responsible fundraisers and auditors</li>
+            </ul>
           </div>
         </div>
       </section>
