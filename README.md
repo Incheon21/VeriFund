@@ -117,8 +117,7 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 
 ### Donation & Proof Flow
 
-### Reward / Fee Mechanism
-
+![VeriFund Logic](./assets/VeriFund_Logic.png)
 
 ## Roles in System
 
@@ -183,7 +182,7 @@ Make sure Docker is running, then navigate into your project's directory that yo
 
 ### 2. Clone or enter your project
  ```bash
- https://github.com/Incheon21/verifund.git
+git clone https://github.com/Incheon21/verifund.git
 cd verifund
  ```
 

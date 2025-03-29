@@ -5,12 +5,23 @@ export const idlFactory = ({ IDL }) => {
     'released' : IDL.Null,
     'pending_release' : IDL.Null,
   });
+  const FileChunk = IDL.Record({
+    'chunk' : IDL.Vec(IDL.Nat8),
+    'index' : IDL.Nat,
+  });
+  const File = IDL.Record({
+    'name' : IDL.Text,
+    'fileType' : IDL.Text,
+    'totalSize' : IDL.Nat,
+    'chunks' : IDL.Vec(FileChunk),
+  });
   const Campaign = IDL.Record({
     'id' : IDL.Text,
     'status' : CampaignStatus,
     'title' : IDL.Text,
     'owner' : IDL.Principal,
     'date' : Time,
+    'file' : IDL.Opt(File),
     'description' : IDL.Text,
     'collected' : IDL.Nat,
     'target' : IDL.Nat,
@@ -19,12 +30,6 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : Time,
     'amount' : IDL.Nat,
     'donor' : IDL.Principal,
-  });
-  const Proof = IDL.Record({
-    'url' : IDL.Text,
-    'verified' : IDL.Bool,
-    'description' : IDL.Text,
-    'timestamp' : Time,
   });
   const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
   const http_request_result = IDL.Record({
@@ -39,9 +44,25 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Bool],
         [],
       ),
+    'deleteCampaignFile' : IDL.Func(
+        [IDL.Principal, IDL.Text, IDL.Text],
+        [IDL.Bool],
+        [],
+      ),
     'deleteFile' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'donate' : IDL.Func([IDL.Principal, IDL.Text, IDL.Nat], [IDL.Bool], []),
     'getAuditor' : IDL.Func([IDL.Text], [IDL.Opt(IDL.Principal)], ['query']),
+    'getCampaignFileChunk' : IDL.Func(
+        [IDL.Text, IDL.Nat],
+        [IDL.Opt(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    'getCampaignFileTotalChunks' : IDL.Func([IDL.Text], [IDL.Nat], ['query']),
+    'getCampaignFileType' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(IDL.Text)],
+        ['query'],
+      ),
     'getCampaigns' : IDL.Func([], [IDL.Vec(Campaign)], ['query']),
     'getCampaignsByUser' : IDL.Func(
         [IDL.Principal],
@@ -81,12 +102,10 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getMyStake' : IDL.Func([IDL.Principal], [IDL.Nat], ['query']),
-    'getProofs' : IDL.Func([IDL.Text], [IDL.Vec(Proof)], ['query']),
     'getTotalChunks' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'pickAuditor' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'releaseDecision' : IDL.Func([IDL.Text, IDL.Bool], [IDL.Bool], []),
     'stakeAsAuditor' : IDL.Func([IDL.Nat], [IDL.Bool], []),
-    'submitProof' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [IDL.Bool], []),
     'transform' : IDL.Func(
         [
           IDL.Record({
@@ -96,6 +115,18 @@ export const idlFactory = ({ IDL }) => {
         ],
         [http_request_result],
         ['query'],
+      ),
+    'uploadCampaignFile' : IDL.Func(
+        [
+          IDL.Principal,
+          IDL.Text,
+          IDL.Text,
+          IDL.Vec(IDL.Nat8),
+          IDL.Nat,
+          IDL.Text,
+        ],
+        [IDL.Bool],
+        [],
       ),
     'uploadFileChunk' : IDL.Func(
         [IDL.Text, IDL.Vec(IDL.Nat8), IDL.Nat, IDL.Text],

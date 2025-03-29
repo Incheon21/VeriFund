@@ -8,6 +8,7 @@ export interface Campaign {
   'title' : string,
   'owner' : Principal,
   'date' : Time,
+  'file' : [] | [File],
   'description' : string,
   'collected' : bigint,
   'target' : bigint,
@@ -20,12 +21,13 @@ export interface Donation {
   'amount' : bigint,
   'donor' : Principal,
 }
-export interface Proof {
-  'url' : string,
-  'verified' : boolean,
-  'description' : string,
-  'timestamp' : Time,
+export interface File {
+  'name' : string,
+  'fileType' : string,
+  'totalSize' : bigint,
+  'chunks' : Array<FileChunk>,
 }
+export interface FileChunk { 'chunk' : Uint8Array | number[], 'index' : bigint }
 export type Time = bigint;
 export interface VeriFund {
   'checkFileExists' : ActorMethod<[string], boolean>,
@@ -33,9 +35,16 @@ export interface VeriFund {
     [Principal, string, string, bigint, Time],
     boolean
   >,
+  'deleteCampaignFile' : ActorMethod<[Principal, string, string], boolean>,
   'deleteFile' : ActorMethod<[string], boolean>,
   'donate' : ActorMethod<[Principal, string, bigint], boolean>,
   'getAuditor' : ActorMethod<[string], [] | [Principal]>,
+  'getCampaignFileChunk' : ActorMethod<
+    [string, bigint],
+    [] | [Uint8Array | number[]]
+  >,
+  'getCampaignFileTotalChunks' : ActorMethod<[string], bigint>,
+  'getCampaignFileType' : ActorMethod<[string], [] | [string]>,
   'getCampaigns' : ActorMethod<[], Array<Campaign>>,
   'getCampaignsByUser' : ActorMethod<[Principal], Array<Campaign>>,
   'getCertifiedData' : ActorMethod<[], Uint8Array | number[]>,
@@ -50,15 +59,17 @@ export interface VeriFund {
   'getICPUSD' : ActorMethod<[], string>,
   'getMyPendingCampaigns' : ActorMethod<[Principal], Array<string>>,
   'getMyStake' : ActorMethod<[Principal], bigint>,
-  'getProofs' : ActorMethod<[string], Array<Proof>>,
   'getTotalChunks' : ActorMethod<[string], bigint>,
   'pickAuditor' : ActorMethod<[string], boolean>,
   'releaseDecision' : ActorMethod<[string, boolean], boolean>,
   'stakeAsAuditor' : ActorMethod<[bigint], boolean>,
-  'submitProof' : ActorMethod<[string, string, string], boolean>,
   'transform' : ActorMethod<
     [{ 'context' : Uint8Array | number[], 'response' : http_request_result }],
     http_request_result
+  >,
+  'uploadCampaignFile' : ActorMethod<
+    [Principal, string, string, Uint8Array | number[], bigint, string],
+    boolean
   >,
   'uploadFileChunk' : ActorMethod<
     [string, Uint8Array | number[], bigint, string],

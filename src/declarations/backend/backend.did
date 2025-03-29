@@ -13,9 +13,13 @@ type VeriFund =
  service {
    checkFileExists: (text) -> (bool);
    createCampaign: (principal, text, text, nat, Time) -> (bool);
+   deleteCampaignFile: (principal, text, text) -> (bool);
    deleteFile: (text) -> (bool);
    donate: (principal, text, nat) -> (bool);
    getAuditor: (text) -> (opt principal) query;
+   getCampaignFileChunk: (text, nat) -> (opt blob) query;
+   getCampaignFileTotalChunks: (text) -> (nat) query;
+   getCampaignFileType: (text) -> (opt text) query;
    getCampaigns: () -> (vec Campaign) query;
    getCampaignsByUser: (principal) -> (vec Campaign) query;
    getCertifiedData: () -> (blob) query;
@@ -31,26 +35,30 @@ type VeriFund =
    getICPUSD: () -> (text);
    getMyPendingCampaigns: (principal) -> (vec text) query;
    getMyStake: (principal) -> (nat) query;
-   getProofs: (text) -> (vec Proof) query;
    getTotalChunks: (text) -> (nat);
    pickAuditor: (text) -> (bool);
    releaseDecision: (text, bool) -> (bool);
    stakeAsAuditor: (nat) -> (bool);
-   submitProof: (text, text, text) -> (bool);
    transform: (record {
                  context: blob;
                  response: http_request_result;
                }) -> (http_request_result) query;
+   uploadCampaignFile: (principal, text, text, blob, nat, text) -> (bool);
    uploadFileChunk: (text, blob, nat, text) -> ();
    whoami: () -> (principal) query;
  };
 type Time = int;
-type Proof = 
+type FileChunk = 
  record {
-   description: text;
-   timestamp: Time;
-   url: text;
-   verified: bool;
+   chunk: blob;
+   index: nat;
+ };
+type File = 
+ record {
+   chunks: vec FileChunk;
+   fileType: text;
+   name: text;
+   totalSize: nat;
  };
 type Donation = 
  record {
@@ -69,6 +77,7 @@ type Campaign =
    collected: nat;
    date: Time;
    description: text;
+   file: opt File;
    id: text;
    owner: principal;
    status: CampaignStatus;
