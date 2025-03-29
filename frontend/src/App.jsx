@@ -21,7 +21,7 @@ export default function App() {
           <>
             {route === "/" && <Home />}
             {route === "/profile" && <Profile />}
-            {route === "/explore" && <Explore />}
+            {route === "/explore" && <Explore setRoute={setRoute} />}
             {route.startsWith("/campaign") && <CampaignDetails id={route.split("/")[2]} />}
             {route === "/auditors" && <Auditors />}
           </>

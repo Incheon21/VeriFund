@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router";
-import { useAuth } from "../utils/auth";
 import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
 import useAsync from "../hooks/useAsync";
 import { getFormattedDate } from "../utils/date";
 
-export default function Explore({}) {
+export default function Explore({ setRoute }) {
   const [campaigns, setCampaigns] = useState([]);
   const [alert, setAlert] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,7 +60,8 @@ export default function Explore({}) {
                           style={{
                             width: `${percentage}%`,
                             backgroundColor: isOverTarget ? `rgb(0, ${Math.min(255, 100 + (Number(camp.collected) - Number(camp.target)) * 2)}, 0)` : "rgb(34, 197, 94)",
-                          }}></div>
+                          }}
+                        ></div>
                       </div>
                       {!loadingUSD && !errorUSD && (
                         <p className="text-sm text-end font-semibold text-blue-600">Collected {(Number(camp.collected) * JSON.parse(data)?.["internet-computer"]?.usd).toFixed(2)} USD</p>
@@ -81,9 +80,9 @@ export default function Explore({}) {
 
                     <div className="flex flex-col space-y-2">
                       <div className="flex justify-between">
-                        <NavLink to={`/campaign/${camp.id}`} className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition">
+                        <button className="inline-block rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 transition cursor-pointer" onClick={() => setRoute(`/campaign/${camp.id}`)}>
                           View Details
-                        </NavLink>
+                        </button>
                       </div>
                     </div>
                   </li>
@@ -96,7 +95,8 @@ export default function Explore({}) {
                 <button
                   onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition">
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
+                >
                   Prev
                 </button>
                 <span className="text-lg">
@@ -105,7 +105,8 @@ export default function Explore({}) {
                 <button
                   onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition">
+                  className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
+                >
                   Next
                 </button>
               </div>

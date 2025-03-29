@@ -122,6 +122,10 @@ export default function Auditors() {
     if (principal) loadData();
   }, [principal]);
 
+  if (!principal) {
+    return <div className="w-full min-h-screen flex justify-center items-center text-2xl font-bold">Please Sign In First</div>;
+  }
+
   return (
     <div className="w-full text-gray-900 pt-6">
       <main className="container mx-auto px-6 py-8">

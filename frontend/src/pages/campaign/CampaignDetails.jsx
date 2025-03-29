@@ -75,7 +75,7 @@ export default function CampaignDetails({ id }) {
 
   if (!campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen w-full flex items-center justify-center">
         <p className="text-gray-500 text-xl">Loading campaign details...</p>
       </div>
     );
@@ -111,7 +111,8 @@ export default function CampaignDetails({ id }) {
               className="h-3 rounded-full bg-green-500"
               style={{
                 width: `${Math.min((Number(campaign.collected) / Number(campaign.target)) * 100, 100)}%`,
-              }}></div>
+              }}
+            ></div>
           </div>
           <p className="text-lg">
             <strong>Status:</strong> {Object.keys(campaign.status)[0]}
@@ -178,7 +179,8 @@ export default function CampaignDetails({ id }) {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
+                  className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                >
                   Next
                 </button>
               </div>
