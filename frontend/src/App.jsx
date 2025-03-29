@@ -12,7 +12,7 @@ export default function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/explore" element={<Explore />} />
       <Route path="/campaign/:id" element={<CampaignDetails />} />
-      <Route path="/auditors" element={<Auditors  />} />
+      <Route path="/auditors" element={<Auditors />} />
     </Routes>
   );
 }

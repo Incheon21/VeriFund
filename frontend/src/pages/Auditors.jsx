@@ -22,10 +22,7 @@ export default function Auditors() {
 
     setIsLoading(true);
     try {
-      const [userStake, pendingCampaigns] = await Promise.all([
-        backendActor.getMyStake(Principal.fromText(principal)),
-        backendActor.getPendingReviewCampaigns(),
-      ]);
+      const [userStake, pendingCampaigns] = await Promise.all([backendActor.getMyStake(Principal.fromText(principal)), backendActor.getPendingReviewCampaigns()]);
 
       setStake(Number(userStake));
 
@@ -103,9 +100,7 @@ export default function Auditors() {
       if (result) {
         setAlert({
           type: "success",
-          message: approve
-            ? "Campaign approved successfully! Funds are released."
-            : "Campaign rejected. Campaign returned to active status.",
+          message: approve ? "Campaign approved successfully! Funds are released." : "Campaign rejected. Campaign returned to active status.",
         });
 
         loadData();
@@ -142,9 +137,7 @@ export default function Auditors() {
               Current Stake: <span className="font-semibold">{stake} tokens</span>
             </p>
 
-            {stake === 0 && (
-              <p className="text-gray-600 italic mb-4">You need to stake tokens to become an auditor and review campaigns.</p>
-            )}
+            {stake === 0 && <p className="text-gray-600 italic mb-4">You need to stake tokens to become an auditor and review campaigns.</p>}
 
             <form onSubmit={handleStake} className="flex items-end space-x-4">
               <button type="submit" className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition">
@@ -182,9 +175,7 @@ export default function Auditors() {
                       </div>
                       <div>
                         <strong>Collected:</strong> {campaign.collected.toString()} ICP
-                        {Number(campaign.collected) >= Number(campaign.target) && (
-                          <span className="ml-2 text-green-600 font-semibold">✓ Target reached</span>
-                        )}
+                        {Number(campaign.collected) >= Number(campaign.target) && <span className="ml-2 text-green-600 font-semibold">✓ Target reached</span>}
                       </div>
                       <div>
                         <strong>Status:</strong> {Object.keys(campaign.status)[0].replace("_", " ")}
@@ -196,23 +187,14 @@ export default function Auditors() {
 
                     {campaign.file && campaign.file.length > 0 ? (
                       <div className="flex flex-wrap gap-3 mt-4 pt-3 border-t justify-between border-gray-200">
-                        <button
-                          onClick={() => handleDownloadFile(campaign.id, campaign.file[0].name)}
-                          className="bg-slate-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-600"
-                        >
+                        <button onClick={() => handleDownloadFile(campaign.id, campaign.file[0].name)} className="bg-slate-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-600">
                           Download Proof
                         </button>
                         <div className="ml-auto flex gap-2">
-                          <button
-                            onClick={() => handleAuditorDecision(campaign, false)}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600"
-                          >
+                          <button onClick={() => handleAuditorDecision(campaign, false)} className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600">
                             Reject
                           </button>
-                          <button
-                            onClick={() => handleAuditorDecision(campaign, true)}
-                            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600"
-                          >
+                          <button onClick={() => handleAuditorDecision(campaign, true)} className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600">
                             Approve
                           </button>
                         </div>
@@ -227,21 +209,13 @@ export default function Auditors() {
               {/* Pagination controls */}
               {campaigns.length > itemsPerPage && (
                 <div className="flex justify-between mt-6">
-                  <button
-                    onClick={() => changePage(-1)}
-                    disabled={currentPage === 1}
-                    className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                  >
+                  <button onClick={() => changePage(-1)} disabled={currentPage === 1} className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
                     Previous
                   </button>
                   <span>
                     Page {currentPage} of {totalPages}
                   </span>
-                  <button
-                    onClick={() => changePage(1)}
-                    disabled={currentPage === totalPages}
-                    className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                  >
+                  <button onClick={() => changePage(1)} disabled={currentPage === totalPages} className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
                     Next
                   </button>
                 </div>
