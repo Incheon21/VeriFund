@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router";
 import Alert from "../../components/Alert";
 import { backendActor } from "../../utils/backendActor";
 import { getFormattedDate } from "../../utils/date";
@@ -7,23 +6,19 @@ import { useAuth } from "../../utils/auth";
 import { Principal } from "@dfinity/principal";
 import useAsync from "../../hooks/useAsync";
 
-export default function CampaignDetails() {
-  const { id } = useParams(); // Get the campaign ID from the URL
+export default function CampaignDetails({ setRoute, id }) {
   const { principal, login } = useAuth();
   const [campaign, setCampaign] = useState(null);
   const [donations, setDonations] = useState([]);
   const [alert, setAlert] = useState(null);
   const [donationAmount, setDonationAmount] = useState("");
-  
+
   // Pagination for donations
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  
+
   // Fetch ICP to USD conversion rate
-  const { data: usdData, loading: loadingUSD, error: errorUSD } = useAsync(
-    () => backendActor.getICPUSD(), 
-    [backendActor]
-  );
+  const { data: usdData, loading: loadingUSD, error: errorUSD } = useAsync(() => backendActor.getICPUSD(), [backendActor]);
 
   const loadCampaignDetails = async () => {
     try {
@@ -61,11 +56,7 @@ export default function CampaignDetails() {
     }
 
     try {
-      const result = await backendActor.donate(
-        Principal.fromText(principal),
-        id,
-        BigInt(donationAmount)
-      );
+      const result = await backendActor.donate(Principal.fromText(principal), id, BigInt(donationAmount));
       if (result) {
         setAlert({ type: "success", message: "Donation successful!" });
         setDonationAmount("");
@@ -80,10 +71,7 @@ export default function CampaignDetails() {
 
   // Calculate total pages and paginated donations
   const totalPages = Math.ceil(donations.length / itemsPerPage);
-  const paginatedDonations = donations.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedDonations = donations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   if (!campaign) {
     return (
@@ -94,12 +82,9 @@ export default function CampaignDetails() {
   }
 
   // Calculate USD value if data is available
-  const icpUsdRate = !loadingUSD && !errorUSD && usdData ? 
-    JSON.parse(usdData)?.["internet-computer"]?.usd : null;
-  const collectedUSD = icpUsdRate ? 
-    (Number(campaign.collected) * icpUsdRate).toFixed(2) : null;
-  const targetUSD = icpUsdRate ? 
-    (Number(campaign.target) * icpUsdRate).toFixed(2) : null;
+  const icpUsdRate = !loadingUSD && !errorUSD && usdData ? JSON.parse(usdData)?.["internet-computer"]?.usd : null;
+  const collectedUSD = icpUsdRate ? (Number(campaign.collected) * icpUsdRate).toFixed(2) : null;
+  const targetUSD = icpUsdRate ? (Number(campaign.target) * icpUsdRate).toFixed(2) : null;
 
   return (
     <div className="text-gray-900 w-full px-6 py-8 mt-12">
@@ -125,9 +110,8 @@ export default function CampaignDetails() {
             <div
               className="h-3 rounded-full bg-green-500"
               style={{
-                width: `${Math.min((Number(campaign.collected) / Number(campaign.target)) * 100, 100)}%`
-              }}
-            ></div>
+                width: `${Math.min((Number(campaign.collected) / Number(campaign.target)) * 100, 100)}%`,
+              }}></div>
           </div>
           <p className="text-lg">
             <strong>Status:</strong> {Object.keys(campaign.status)[0]}
@@ -149,18 +133,11 @@ export default function CampaignDetails() {
               onChange={(e) => setDonationAmount(e.target.value)}
               className="flex-grow px-4 py-2 border rounded-lg"
             />
-            <button
-              onClick={principal ? donateToCampaign : login}
-              className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors"
-            >
+            <button onClick={principal ? donateToCampaign : login} className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
               {principal ? "Donate" : "Sign in to donate"}
             </button>
           </div>
-          {icpUsdRate && donationAmount && !isNaN(donationAmount) && donationAmount > 0 && (
-            <p className="mt-2 text-sm text-blue-600">
-              ≈ ${(Number(donationAmount) * icpUsdRate).toFixed(2)} USD
-            </p>
-          )}
+          {icpUsdRate && donationAmount && !isNaN(donationAmount) && donationAmount > 0 && <p className="mt-2 text-sm text-blue-600">≈ ${(Number(donationAmount) * icpUsdRate).toFixed(2)} USD</p>}
         </div>
       </div>
 
@@ -180,11 +157,7 @@ export default function CampaignDetails() {
                     <p className="text-sm text-gray-700">
                       <strong>Amount:</strong> {donation.amount.toString()} ICP
                     </p>
-                    {icpUsdRate && (
-                      <span className="ml-2 text-xs text-blue-600">
-                        ≈ ${(Number(donation.amount) * icpUsdRate).toFixed(2)} USD
-                      </span>
-                    )}
+                    {icpUsdRate && <span className="ml-2 text-xs text-blue-600">≈ ${(Number(donation.amount) * icpUsdRate).toFixed(2)} USD</span>}
                   </div>
                   <p className="text-sm text-gray-700">
                     <strong>Timestamp:</strong> {getFormattedDate(donation.timestamp)}
@@ -196,11 +169,7 @@ export default function CampaignDetails() {
             {/* Pagination Controls */}
             {donations.length > itemsPerPage && (
               <div className="flex items-center justify-center mt-6 space-x-4">
-                <button
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                >
+                <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
                   Prev
                 </button>
                 <span>
@@ -209,8 +178,7 @@ export default function CampaignDetails() {
                 <button
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-                >
+                  className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-50">
                   Next
                 </button>
               </div>
