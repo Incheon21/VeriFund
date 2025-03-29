@@ -51,7 +51,7 @@ const Navbar = () => {
           </NavLink>
         </div>
         {isAuthenticated ? (
-          <div clas>
+          <div>
             <button
               className={` ${dropdownOpen ? "bg-black" : "bg-transparent"} hover:bg-black rounded-full text-white font-bold p-2`}
               onClick={toggleDropdown}>
