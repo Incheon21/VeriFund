@@ -125,20 +125,12 @@ To create a global standard for transparent, trustless, and verifiable charitabl
 All donations made to a campaign are recorded on-chain — viewable by anyone, tamper-proof, and timestamped.  
 This allows donors, auditors, and even the public to verify donation flows at any time without needing permission.
 
-Example:  
+>Example:  
 `Donor A → Campaign B → 20 ICP → 2025-03-25 12:03 UTC`
 
 ---
 
-Repeat this pattern for each core feature.
 
----
-
-### 💡 Suggested Expanded Core Features Outline
-
-Here’s a template you can use to expand:
-
----
 
 #### 🧾 **Certified Frontend Access**  
 Every interface users interact with is backed by **certified variables** from the Internet Computer.  
@@ -152,7 +144,7 @@ This ensures data displayed (e.g., campaign balance, proof status) hasn’t been
 Fundraisers must upload usage reports (receipts, invoices, photos, links).  
 These are stored on-chain (or verified via link) and become public proof of accountability.
 
-> In future iterations: FileVault or decentralized file storage (e.g., web3.storage) integration.
+> Important mechanism to prevent malicious usage of fund
 
 ---
 
@@ -163,7 +155,7 @@ Their votes are also recorded on-chain for transparency.
 
 > Adds a layer of social trust without central authority.
 
----
+--- 
 
 #### 💰 **Staking + Reward Mechanism**  
 Auditors stake ICP to prevent spam or lazy participation.  
@@ -172,7 +164,7 @@ If they fail to act or vote fraudulently, their stake is slashed.
 
 > Makes honesty economically incentivized.
 
---
+
       
 
 #### Donation & Proof Flow
