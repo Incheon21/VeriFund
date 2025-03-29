@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import Alert from "../../components/Alert";
 import { backendActor } from "../../utils/backendActor";
+import { getFormattedDate } from "../../utils/date";
 
 export default function CampaignDetails() {
   const { id } = useParams(); // Get the campaign ID from the URL
@@ -55,12 +56,7 @@ export default function CampaignDetails() {
             <strong>Status:</strong> {Object.keys(campaign.status)[0]}
           </p>
           <p className="text-lg">
-            <strong>Date:</strong>{" "}
-            {new Date(Number(campaign.date) / 1_000_000).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            <strong>Date:</strong> {getFormattedDate(campaign.date)}
           </p>
         </div>
       </div>
@@ -80,7 +76,7 @@ export default function CampaignDetails() {
                   <strong>Amount:</strong> {donation.amount.toString()} ICP
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Timestamp:</strong> {new Date(Number(donation.timestamp) / 1_000_000).toLocaleString()}
+                  <strong>Timestamp:</strong> {ngetFormattedDate(donation.timestamp)}
                 </p>
               </li>
             ))}

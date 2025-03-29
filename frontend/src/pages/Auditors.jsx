@@ -3,6 +3,7 @@ import { useAuth } from "../utils/auth";
 import { Principal } from "@dfinity/principal";
 import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
+import { getFormattedDate } from "../utils/date";
 
 export default function Auditors() {
   const { principal } = useAuth();
@@ -105,9 +106,6 @@ export default function Auditors() {
           message: approve
             ? "Campaign approved successfully! Funds are released."
             : "Campaign rejected. Campaign returned to active status.",
-          message: approve
-            ? "Campaign approved successfully! Funds are released."
-            : "Campaign rejected. Campaign returned to active status.",
         });
 
         loadData();
@@ -173,9 +171,7 @@ export default function Auditors() {
                   <li key={campaign.id} className="bg-gray-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-md">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="text-lg font-semibold">{campaign.title}</h3>
-                      <div className="text-sm font-medium text-gray-500">
-                        {new Date(Number(campaign.date) / 1_000_000).toLocaleDateString()}
-                      </div>
+                      <div className="text-sm font-medium text-gray-500">{getFormattedDate(campaign.date)}</div>
                     </div>
 
                     <p className="text-gray-600 mb-3">{campaign.description}</p>

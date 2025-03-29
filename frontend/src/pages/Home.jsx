@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useAuth } from "../utils/auth.jsx";
+import React, { useEffect, useRef } from "react";
 
 const Home = () => {
-  const { isAuthenticated, principal, whoami } = useAuth();
   const canvasRef = useRef(null);
 
   useEffect(() => {

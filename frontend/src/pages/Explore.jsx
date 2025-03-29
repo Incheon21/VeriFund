@@ -4,37 +4,27 @@ import { Principal } from "@dfinity/principal";
 import { useAuth } from "../utils/auth";
 import Alert from "../components/Alert";
 import { backendActor } from "../utils/backendActor";
+import useAsync from "../hooks/useAsync";
+import { getFormattedDate } from "../utils/date";
 
 export default function Explore() {
-  const [campaigns, setCampaigns] = useState([]);
   const { principal } = useAuth();
+  const [campaigns, setCampaigns] = useState([]);
   const [alert, setAlert] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [donationAmounts, setDonationAmounts] = useState({});
 
+  const { data: campaignsData, loading, error } = useAsync(() => backendActor.getCampaigns(), []);
+
+  useEffect(() => {
+    if (campaignsData) setCampaigns(campaignsData);
+  }, [campaignsData]);
+
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
 
-  const handlePrevPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-  };
-
   const handleDonationChange = (campaignId, amount) => {
     setDonationAmounts((prev) => ({ ...prev, [campaignId]: amount }));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
-  };
-
-  const loadCampaigns = async () => {
-    try {
-      const campaignsData = await backendActor.getCampaigns();
-      setCampaigns(campaignsData);
-    } catch (error) {
-      console.error("Error loading campaigns:", error);
-      setAlert({ type: "error", message: "Error loading campaigns." });
-    }
   };
 
   const donateToCampaign = async (campaignId) => {
@@ -48,7 +38,6 @@ export default function Explore() {
       const result = await backendActor.donate(Principal.fromText(principal), campaignId, BigInt(amount));
       if (result) {
         setAlert({ type: "success", message: "Donation successful!" });
-        loadCampaigns();
       } else {
         setAlert({ type: "error", message: "Donation failed." });
       }
@@ -57,16 +46,17 @@ export default function Explore() {
     }
   };
 
-  useEffect(() => {
-    loadCampaigns();
-  }, []);
-
   return (
     <div className="w-full min-h-screen mt-12 text-gray-900">
       {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} />}
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Explore Campaigns</h1>
-        {campaigns.length === 0 ? (
+
+        {loading ? (
+          <p className="text-center text-gray-500">Loading campaigns...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">Error loading campaigns: {error}</p>
+        ) : campaigns.length === 0 ? (
           <p className="text-center text-gray-500">No campaigns available. Please check back later.</p>
         ) : (
           <>
@@ -74,6 +64,7 @@ export default function Explore() {
               {paginatedCampaigns.map((camp, index) => {
                 const percentage = Math.min((Number(camp.collected) / Number(camp.target)) * 100, 100);
                 const isOverTarget = Number(camp.collected) > Number(camp.target);
+
                 return (
                   <li
                     key={index}
@@ -84,6 +75,7 @@ export default function Explore() {
                     </div>
                     <h2 className="text-2xl font-bold mb-2">{camp.title}</h2>
                     <p className="text-gray-700 mb-4">{camp.description}</p>
+
                     <div className="mb-2">
                       <p className="text-sm font-semibold text-gray-600">
                         Collected: {camp.collected.toString()} / {camp.target.toString()} ICP
@@ -100,13 +92,9 @@ export default function Explore() {
                         ></div>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500 ">
-                      <strong>Date:</strong>{" "}
-                      {new Date(Number(camp.date) / 1_000_000).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+
+                    <p className="text-sm text-gray-500">
+                      <strong>Date:</strong> {getFormattedDate(camp.date)}
                     </p>
                     <p className="text-sm text-gray-500">
                       <strong>Status:</strong> {Object.keys(camp.status)[0]}
@@ -114,6 +102,7 @@ export default function Explore() {
                     <p className="text-sm text-gray-500 mb-4">
                       <strong>Owner:</strong> {camp.owner.toText()}
                     </p>
+
                     <div className="flex flex-col space-y-2">
                       <input
                         type="number"
@@ -142,10 +131,11 @@ export default function Explore() {
                 );
               })}
             </ul>
+
             {campaigns.length > 6 && (
               <div className="flex items-center justify-center mt-8 space-x-4">
                 <button
-                  onClick={handlePrevPage}
+                  onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))}
                   disabled={currentPage === 1}
                   className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
                 >
@@ -155,7 +145,7 @@ export default function Explore() {
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
-                  onClick={handleNextPage}
+                  onClick={() => setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))}
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 disabled:opacity-50 transition"
                 >
