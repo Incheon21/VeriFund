@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import Alert from "../../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-  },
-});
+import { getFormattedDate } from "../../utils/date";
+import { backendActor } from "../../utils/backend";
 
 export default function CampaignDetails() {
   const { id } = useParams(); // Get the campaign ID from the URL
@@ -59,12 +53,7 @@ export default function CampaignDetails() {
             <strong>Status:</strong> {Object.keys(campaign.status)[0]}
           </p>
           <p className="text-lg">
-            <strong>Date:</strong>{" "}
-            {new Date(Number(campaign.date) / 1_000_000).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            <strong>Date:</strong> {getFormattedDate(campaign.date)}
           </p>
         </div>
       </div>
@@ -84,7 +73,7 @@ export default function CampaignDetails() {
                   <strong>Amount:</strong> {donation.amount.toString()} ICP
                 </p>
                 <p className="text-sm text-gray-700">
-                  <strong>Timestamp:</strong> {new Date(Number(donation.timestamp) / 1_000_000).toLocaleString()}
+                  <strong>Timestamp:</strong> {getFormattedDate(donation.timestamp)}
                 </p>
               </li>
             ))}

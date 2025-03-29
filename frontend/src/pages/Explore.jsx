@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { createActor } from "declarations/backend";
-import { canisterId } from "declarations/backend/index.js";
 import { NavLink } from "react-router";
 import { Principal } from "@dfinity/principal";
 import { useAuth } from "../utils/auth";
 import Alert from "../components/Alert";
-
-const backendActor = createActor(canisterId, {
-  agentOptions: {
-    host: process.env.DFX_NETWORK === "ic" ? "https://ic0.app" : "http://localhost:4943",
-  },
-});
+import { backendActor } from "../utils/backend";
 
 export default function Explore() {
   const [campaigns, setCampaigns] = useState([]);
