@@ -1,13 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap");
 @import "tailwindcss";
 
-body {
-  font-family: "CircularXXWeb", sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  background-color: #fcf7f6;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+@layer base {
+  body {
+    @apply bg-[#0a1020] text-[#e4e4e7] font-sans antialiased;
+  }
 }
