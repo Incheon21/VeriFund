@@ -281,7 +281,7 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
     };
   };
 
-// This transform function is required for HTTPS outcalls to strip headers.
+  // This transform function is required for HTTPS outcalls to strip headers.
   public query func transform({
     response : IC.http_request_result;
   }) : async IC.http_request_result {
@@ -291,15 +291,17 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
   };
 
   public func getICPUSD() : async Text {
-    let host : Text = "api.exchange.coinbase.com";
-    let url = "https://" # host # "/products/ICP-USD/ticker";
+    let host : Text = "api.coingecko.com";
+    let url = "https://" # host # "/api/v3/simple/price?ids=internet-computer&vs_currencies=usd";
+
     let request_headers = [
-      { name = "User-Agent"; value = "price-feed" },
+      { name = "User-Agent"; value = "verifund-canister" },
+      { name = "Accept"; value = "application/json" }
     ];
 
     let http_request : IC.http_request_args = {
       url = url;
-      max_response_bytes = null;
+      max_response_bytes = ?2000;
       headers = request_headers;
       body = null;
       method = #get;
@@ -309,23 +311,15 @@ public func uploadCampaignFile(owner: Principal, id: Text, name: Text, chunk: Bl
       };
     };
 
-    Cycles.add<system>(230_000_000_000);
+    Cycles.add<system>(230_949_972_000);  // Sufficient cycles for HTTPS outcall
     let http_response : IC.http_request_result = await IC.http_request(http_request);
 
-    let decoded_text : Text = switch (Text.decodeUtf8(http_response.body)) {
+    let body_text = switch (Text.decodeUtf8(http_response.body)) {
       case null { "No value returned" };
-      case (?y) { y };
+      case (?body) { body };
     };
 
-    let partsArr = Iter.toArray(Text.split(decoded_text, #text "\"price\":\""));
-    if (partsArr.size() < 2) return " Unavailable ";
-    let after_price = partsArr[1];
-
-    let quoteArr = Iter.toArray(Text.split(after_price, #text "\""));
-    if (quoteArr.size() < 1) return " Unavailable ";
-    let price_str = quoteArr[0];
-
-    return price_str;
+    return body_text;
   };
 
   // Returns campaigns that the specified user must submit proof for (used in frontend)

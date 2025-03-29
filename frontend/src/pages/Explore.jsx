@@ -15,10 +15,15 @@ export default function Explore() {
   const [donationAmounts, setDonationAmounts] = useState({});
 
   const { data: campaignsData, loading, error } = useAsync(() => backendActor.getCampaigns(), []);
+  const { data, loading: loadingUSD, error: errorUSD } = useAsync(() => backendActor.getICPUSD(), [backendActor]);
 
   useEffect(() => {
     if (campaignsData) setCampaigns(campaignsData);
   }, [campaignsData]);
+
+  useEffect(() => {
+    console.log({ "icp usd": JSON.parse(data)?.["internet-computer"].usd });
+  }, [data]);
 
   const totalPages = Math.ceil(campaigns.length / 6);
   const paginatedCampaigns = campaigns.slice((currentPage - 1) * 6, currentPage * 6);
@@ -91,6 +96,11 @@ export default function Explore() {
                           }}
                         ></div>
                       </div>
+                      {!loadingUSD && !errorUSD && (
+                        <p className="text-sm text-end font-semibold text-blue-600">
+                          Collected {(Number(camp.collected) * JSON.parse(data)?.["internet-computer"]?.usd).toFixed(2)} USD
+                        </p>
+                      )}
                     </div>
 
                     <p className="text-sm text-gray-500">
